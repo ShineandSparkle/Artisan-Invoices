@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -17,111 +17,99 @@ export type Database = {
       customers: {
         Row: {
           address: string | null
-          city: string | null
-          company: string | null
-          country: string | null
           created_at: string
           email: string | null
-          gst_number: string | null
+          gst_no: string | null
           id: string
           name: string
           phone: string | null
-          pincode: string | null
-          state: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           address?: string | null
-          city?: string | null
-          company?: string | null
-          country?: string | null
           created_at?: string
           email?: string | null
-          gst_number?: string | null
+          gst_no?: string | null
           id?: string
           name: string
           phone?: string | null
-          pincode?: string | null
-          state?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           address?: string | null
-          city?: string | null
-          company?: string | null
-          country?: string | null
           created_at?: string
           email?: string | null
-          gst_number?: string | null
+          gst_no?: string | null
           id?: string
           name?: string
           phone?: string | null
-          pincode?: string | null
-          state?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
       invoices: {
         Row: {
-          amount: number
           created_at: string
-          customer_id: string
-          date: string
-          due_date: string
+          customer_address: string | null
+          customer_email: string | null
+          customer_gst_no: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string | null
+          due_date: string | null
           id: string
+          invoice_date: string
           invoice_number: string
           items: Json
           notes: string | null
-          paid_date: string | null
-          quotation_id: string | null
           status: string
-          subtotal: number | null
-          tax_amount: number | null
-          tax_type: string | null
+          subtotal: number
+          tax_amount: number
+          tax_rate: number | null
+          total_amount: number
           updated_at: string
-          user_id: string
         }
         Insert: {
-          amount?: number
           created_at?: string
-          customer_id: string
-          date: string
-          due_date: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_gst_no?: string | null
+          customer_id?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          due_date?: string | null
           id?: string
+          invoice_date?: string
           invoice_number: string
           items?: Json
           notes?: string | null
-          paid_date?: string | null
-          quotation_id?: string | null
           status?: string
-          subtotal?: number | null
-          tax_amount?: number | null
-          tax_type?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number | null
+          total_amount?: number
           updated_at?: string
-          user_id: string
         }
         Update: {
-          amount?: number
           created_at?: string
-          customer_id?: string
-          date?: string
-          due_date?: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_gst_no?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          due_date?: string | null
           id?: string
+          invoice_date?: string
           invoice_number?: string
           items?: Json
           notes?: string | null
-          paid_date?: string | null
-          quotation_id?: string | null
           status?: string
-          subtotal?: number | null
-          tax_amount?: number | null
-          tax_type?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number | null
+          total_amount?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -131,110 +119,58 @@ export type Database = {
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "invoices_quotation_id_fkey"
-            columns: ["quotation_id"]
-            isOneToOne: false
-            referencedRelation: "quotations"
-            referencedColumns: ["id"]
-          },
         ]
       }
-      quotations: {
+      payments: {
         Row: {
           amount: number
           created_at: string
-          customer_id: string
-          date: string
+          customer_name: string
           id: string
-          items: Json
+          invoice_id: string | null
           notes: string | null
-          quotation_number: string
-          status: string
-          subtotal: number | null
-          tax_amount: number | null
-          tax_type: string | null
-          updated_at: string
-          user_id: string
-          valid_until: string
+          payment_date: string
+          payment_method: string
         }
         Insert: {
-          amount?: number
+          amount: number
           created_at?: string
-          customer_id: string
-          date: string
+          customer_name: string
           id?: string
-          items?: Json
+          invoice_id?: string | null
           notes?: string | null
-          quotation_number: string
-          status?: string
-          subtotal?: number | null
-          tax_amount?: number | null
-          tax_type?: string | null
-          updated_at?: string
-          user_id: string
-          valid_until: string
+          payment_date?: string
+          payment_method: string
         }
         Update: {
           amount?: number
           created_at?: string
-          customer_id?: string
-          date?: string
+          customer_name?: string
           id?: string
-          items?: Json
+          invoice_id?: string | null
           notes?: string | null
-          quotation_number?: string
-          status?: string
-          subtotal?: number | null
-          tax_amount?: number | null
-          tax_type?: string | null
-          updated_at?: string
-          user_id?: string
-          valid_until?: string
+          payment_date?: string
+          payment_method?: string
         }
         Relationships: [
           {
-            foreignKeyName: "quotations_customer_id_fkey"
-            columns: ["customer_id"]
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
             isOneToOne: false
-            referencedRelation: "customers"
+            referencedRelation: "invoices"
             referencedColumns: ["id"]
           },
         ]
-      }
-      settings: {
-        Row: {
-          created_at: string
-          id: string
-          setting_data: Json
-          setting_type: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          setting_data: Json
-          setting_type: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          setting_data?: Json
-          setting_type?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_invoice_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
