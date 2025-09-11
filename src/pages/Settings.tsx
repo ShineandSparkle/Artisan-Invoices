@@ -24,7 +24,7 @@ const Settings = () => {
     saveNotificationSettings
   } = useSettings();
   
-  const { customers, quotations, invoices, deleteCustomer, deleteQuotation, deleteInvoice } = useSupabaseData();
+  const { customers, invoices, deleteCustomer, deleteInvoice } = useSupabaseData();
 
   const handleCompanyChange = (field: string, value: string) => {
     setCompanySettings(prev => ({ ...prev, [field]: value }));
@@ -78,14 +78,8 @@ const Settings = () => {
   const handleDeleteItems = async () => {
     try {
       // Find and delete specific items
-      const quoToDelete = quotations.filter(q => q.quotation_number === "QUO-001");
       const invToDelete = invoices.filter(i => i.invoice_number === "INV-001" || i.invoice_number === "INV-002");
       const custToDelete = customers.filter(c => c.name === "Acme Corporation");
-
-      // Delete quotations
-      for (const quo of quoToDelete) {
-        await deleteQuotation(quo.id);
-      }
 
       // Delete invoices
       for (const inv of invToDelete) {
@@ -99,7 +93,7 @@ const Settings = () => {
 
       toast({
         title: "Items Deleted",
-        description: "Selected quotations, invoices, and customers have been deleted."
+        description: "Selected invoices and customers have been deleted."
       });
     } catch (error) {
       console.error("Error deleting items:", error);
