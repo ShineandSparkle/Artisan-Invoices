@@ -174,6 +174,14 @@ export default function Auth() {
           >
             {isSubmitting ? "Processing..." : isLogin ? "Sign In" : "Sign Up"}
           </Button>
+
+          {isLogin && (
+            <div className="mt-4 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg">
+              <p className="text-white/80 text-sm text-center mb-2">Demo Credentials:</p>
+              <p className="text-white text-sm text-center font-mono">admin@gmail.com</p>
+              <p className="text-white text-sm text-center font-mono">123456</p>
+            </div>
+          )}
         </form>
 
         <div className="mt-6 text-center">
