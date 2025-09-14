@@ -48,11 +48,15 @@ export const createHardcodedAdminUser = async () => {
 // Alternative simpler approach - hardcoded login bypass
 export const handleHardcodedLogin = async (email: string, password: string) => {
   if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    console.log("Attempting admin login for:", email);
+    
     // First, try to sign in with existing credentials
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email: ADMIN_EMAIL,
       password: ADMIN_PASSWORD,
     });
+
+    console.log("Sign in attempt result:", { signInData, signInError });
 
     // If sign in succeeds, return the result
     if (signInData?.user && !signInError) {
@@ -62,13 +66,33 @@ export const handleHardcodedLogin = async (email: string, password: string) => {
     // If sign in fails with "Invalid login credentials", the user doesn't exist
     // So create them by signing up first
     if (signInError?.message === "Invalid login credentials") {
+      console.log("User doesn't exist, attempting signup");
+      
+      // Try creating admin user via direct signup
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: ADMIN_EMAIL,
         password: ADMIN_PASSWORD,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            role: 'admin',
+            name: 'Admin User'
+          }
         },
       });
+
+      console.log("Signup attempt result:", { signUpData, signUpError });
+
+      // Check if the error is email_address_invalid
+      if (signUpError?.message?.includes("Email address") && signUpError?.message?.includes("invalid")) {
+        // Return a custom error explaining the issue
+        return { 
+          data: null, 
+          error: { 
+            message: "Email validation failed. Please check your Supabase Auth settings: Go to your Supabase dashboard → Authentication → Settings → General and ensure 'Allow new users to sign up' is enabled and there are no email domain restrictions."
+          } 
+        };
+      }
 
       // If signup succeeds, the user is automatically logged in
       if (signUpData?.user && !signUpError) {
