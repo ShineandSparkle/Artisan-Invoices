@@ -1,6 +1,24 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+export interface Quotation {
+  id: string;
+  quotation_number: string;
+  customer_id: string | null;
+  date: string;
+  valid_until: string | null;
+  amount: number;
+  subtotal: number;
+  tax_amount: number;
+  tax_type: string | null;
+  status: string;
+  items: any[];
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+  user_id: string | null;
+}
+
 export interface Customer {
   id: string;
   name: string;
@@ -47,6 +65,7 @@ export interface Payment {
 export const useSupabaseData = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,6 +83,12 @@ export const useSupabaseData = () => {
         .select("*")
         .order("created_at", { ascending: false });
 
+      // Fetch quotations
+      const { data: quotationsData } = await supabase
+        .from("quotations")
+        .select("*")
+        .order("created_at", { ascending: false });
+
       // Fetch payments
       const { data: paymentsData } = await supabase
         .from("payments")
@@ -74,6 +99,10 @@ export const useSupabaseData = () => {
       setInvoices((invoicesData || []).map(i => ({
         ...i,
         items: Array.isArray(i.items) ? i.items : []
+      })));
+      setQuotations((quotationsData || []).map(q => ({
+        ...q,
+        items: Array.isArray(q.items) ? q.items : []
       })));
       setPayments(paymentsData || []);
     } catch (error) {
@@ -203,9 +232,71 @@ export const useSupabaseData = () => {
     return null;
   };
 
+  const addQuotation = async (quotationData: Omit<Quotation, "id" | "quotation_number" | "created_at" | "updated_at">) => {
+    // Generate quotation number
+    const { count } = await supabase
+      .from("quotations")
+      .select("*", { count: "exact", head: true });
+
+    const quotationNumber = `QUO-${String((count || 0) + 1).padStart(3, '0')}`;
+
+    const { data, error } = await supabase
+      .from("quotations")
+      .insert([{ 
+        ...quotationData, 
+        quotation_number: quotationNumber,
+        user_id: (await supabase.auth.getUser()).data.user?.id || null
+      }])
+      .select()
+      .single();
+
+    if (!error && data) {
+      const processedData = {
+        ...data,
+        items: Array.isArray(data.items) ? data.items : []
+      };
+      setQuotations(prev => [processedData, ...prev]);
+      return processedData;
+    }
+    return null;
+  };
+
+  const updateQuotation = async (quotationId: string, quotationData: Partial<Quotation>) => {
+    const { data, error } = await supabase
+      .from("quotations")
+      .update(quotationData)
+      .eq("id", quotationId)
+      .select()
+      .single();
+
+    if (!error && data) {
+      const processedData = {
+        ...data,
+        items: Array.isArray(data.items) ? data.items : []
+      };
+      setQuotations(prev => prev.map(q => q.id === quotationId ? processedData : q));
+      return processedData;
+    }
+    return null;
+  };
+
+  const deleteQuotation = async (quotationId: string) => {
+    const { error } = await supabase
+      .from("quotations")
+      .delete()
+      .eq("id", quotationId);
+
+    if (!error) {
+      setQuotations(prev => prev.filter(q => q.id !== quotationId));
+      return true;
+    }
+    return false;
+  };
+
   return {
     customers,
     invoices,
+    quotations,
     payments,
     loading,
     addCustomer,
@@ -214,6 +305,9 @@ export const useSupabaseData = () => {
     addInvoice,
     updateInvoice,
     deleteInvoice,
+    addQuotation,
+    updateQuotation,
+    deleteQuotation,
     addPayment,
     refreshData: fetchData
   };

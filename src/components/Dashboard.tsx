@@ -26,7 +26,7 @@ interface DashboardProps {
 const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreateInvoice, onCreateCustomer, onViewQuotations, onViewInvoices }: DashboardProps) => {
   const totalRevenue = invoices
     .filter(i => i.status === "paid")
-    .reduce((sum, i) => sum + (i.amount || 0), 0);
+    .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
 
   const stats = [
     {
@@ -61,7 +61,7 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
 
   const recentQuotations = quotations.slice(0, 3).map(q => ({
     id: q.quotation_number || q.id,
-    customer: q.customer?.name || "Unknown Customer",
+    customer: customers.find(c => c.id === q.customer_id)?.name || "Unknown Customer", 
     amount: `₹${(q.amount || 0).toLocaleString()}`,
     status: q.status,
     date: q.date
@@ -69,10 +69,10 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
 
   const recentInvoices = invoices.slice(0, 3).map(i => ({
     id: i.invoice_number || i.id,
-    customer: i.customer?.name || "Unknown Customer",
-    amount: `₹${(i.amount || 0).toLocaleString()}`,
+    customer: i.customer_name || "Unknown Customer",
+    amount: `₹${(i.total_amount || i.subtotal || 0).toLocaleString()}`,
     status: i.status,
-    date: i.date
+    date: i.invoice_date
   }));
 
   const getStatusBadge = (status: string) => {

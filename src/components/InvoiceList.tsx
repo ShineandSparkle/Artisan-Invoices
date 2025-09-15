@@ -58,10 +58,10 @@ const InvoiceList = ({
   const displayInvoices = invoices.map(i => ({
     id: i.id,
     invoiceNumber: i.invoice_number,
-    customer: i.customer?.name || "Unknown Customer",
-    amount: i.amount,
+    customer: i.customer_name || "Unknown Customer",
+    amount: i.total_amount || i.subtotal || 0,
     status: i.status,
-    date: i.date,
+    date: i.invoice_date,
     dueDate: i.due_date,
     paidDate: i.paid_date || "-",
     fullInvoice: i

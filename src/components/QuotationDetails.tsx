@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Download, Send, Eye } from "lucide-react";
 
 interface QuotationDetailsProps {
   quotation: any;
@@ -16,11 +17,12 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
     const variants: Record<string, any> = {
       save: { variant: "secondary", label: "Save" },
       sent: { variant: "outline", label: "Sent" },
+      pending: { variant: "secondary", label: "Pending" },
       accepted: { variant: "default", label: "Accepted", className: "bg-success text-success-foreground" },
       rejected: { variant: "destructive", label: "Rejected" },
-      expired: { variant: "secondary", label: "Expired", className: "bg-muted text-muted-foreground" }
+      expired: { variant: "secondary", label: "Expired" }
     };
-    
+
     const config = variants[status] || variants.save;
     return (
       <Badge variant={config.variant} className={config.className}>
@@ -33,145 +35,106 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Quotation Details - {quotation.quotation_number}</DialogTitle>
+          <DialogTitle className="flex items-center gap-4">
+            <span>Quotation Details - {quotation.quotation_number}</span>
+            {getStatusBadge(quotation.status)}
+          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
-          {/* Header Info */}
+          {/* Quotation Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Quotation Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Quotation Number:</span>
-                  <span>{quotation.quotation_number}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Date:</span>
-                  <span>{quotation.date}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Valid Until:</span>
-                  <span>{quotation.valid_until}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Status:</span>
-                  <span>{getStatusBadge(quotation.status)}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Customer Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Name:</span>
-                  <span>{quotation.customer?.name || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Email:</span>
-                  <span>{quotation.customer?.email || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Phone:</span>
-                  <span>{quotation.customer?.phone || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Company:</span>
-                  <span>{quotation.customer?.company || 'N/A'}</span>
-                </div>
-              </CardContent>
-            </Card>
+            <div>
+              <h3 className="font-semibold mb-2">Quotation Information</h3>
+              <div className="space-y-2 text-sm">
+                <div><strong>Quotation Number:</strong> {quotation.quotation_number}</div>
+                <div><strong>Date:</strong> {quotation.date}</div>
+                <div><strong>Valid Until:</strong> {quotation.valid_until || "N/A"}</div>
+                <div><strong>Status:</strong> {getStatusBadge(quotation.status)}</div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-2">Customer Information</h3>
+              <div className="space-y-2 text-sm">
+                <div><strong>Customer ID:</strong> {quotation.customer_id || "N/A"}</div>
+              </div>
+            </div>
           </div>
 
-          {/* Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {quotation.items && quotation.items.length > 0 ? (
-                  quotation.items.map((item: any, index: number) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Description</span>
-                          <p className="mt-1">{item.description}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Quantity</span>
-                          <p className="mt-1">{item.quantity}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Rate</span>
-                          <p className="mt-1">₹{item.rate?.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Amount</span>
-                          <p className="mt-1 font-semibold">₹{item.amount?.toFixed(2)}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground">No items found</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <Separator />
 
-          {/* Total */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-end">
-                <div className="w-64 space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span>₹{quotation.subtotal?.toFixed(2) || '0.00'}</span>
-                  </div>
-                  {quotation.tax_type === 'IGST' ? (
-                    <div className="flex justify-between">
-                      <span>IGST (5%):</span>
-                      <span>₹{quotation.tax_amount?.toFixed(2) || '0.00'}</span>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex justify-between">
-                        <span>CGST (2.5%):</span>
-                        <span>₹{((quotation.tax_amount || 0) / 2).toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>SGST (2.5%):</span>
-                        <span>₹{((quotation.tax_amount || 0) / 2).toFixed(2)}</span>
-                      </div>
-                    </>
-                  )}
-                  <Separator />
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>Total Amount:</span>
-                    <span>₹{quotation.amount?.toLocaleString()}</span>
-                  </div>
-                </div>
+          {/* Items */}
+          <div>
+            <h3 className="font-semibold mb-4">Items</h3>
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="text-left p-3">Description</th>
+                    <th className="text-right p-3">Qty</th>
+                    <th className="text-right p-3">Rate</th>
+                    <th className="text-right p-3">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {quotation.items?.map((item: any, index: number) => (
+                    <tr key={index} className="border-t">
+                      <td className="p-3">{item.description}</td>
+                      <td className="text-right p-3">{item.quantity}</td>
+                      <td className="text-right p-3">₹{item.rate?.toFixed(2)}</td>
+                      <td className="text-right p-3">₹{item.amount?.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="flex justify-end">
+            <div className="w-80 space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal:</span>
+                <span>₹{quotation.subtotal?.toFixed(2)}</span>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex justify-between">
+                <span>Tax:</span>
+                <span>₹{quotation.tax_amount?.toFixed(2)}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total:</span>
+                <span>₹{quotation.amount?.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
 
           {/* Notes */}
           {quotation.notes && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Notes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap">{quotation.notes}</p>
-              </CardContent>
-            </Card>
+            <div>
+              <h3 className="font-semibold mb-2">Notes</h3>
+              <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
+                {quotation.notes}
+              </p>
+            </div>
           )}
+
+          {/* Actions */}
+          <div className="flex gap-2 pt-4 border-t">
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
+            <Button variant="outline" size="sm">
+              <Send className="h-4 w-4 mr-2" />
+              Send to Customer
+            </Button>
+            <Button variant="outline" size="sm" onClick={onClose}>
+              <Eye className="h-4 w-4 mr-2" />
+              Close
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
