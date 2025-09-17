@@ -4,6 +4,7 @@ import Dashboard from "@/components/Dashboard";
 import InvoiceList from "@/components/InvoiceList";
 import CustomerList from "@/components/CustomerList";
 import Settings from "@/pages/Settings";
+import StockRegister from "@/components/StockRegister";
 import CustomerForm from "@/components/forms/CustomerForm";
 import InvoiceForm from "@/components/forms/InvoiceForm";
 import InvoiceDetails from "@/components/InvoiceDetails";
@@ -375,6 +376,8 @@ const Index = () => {
             mode="edit"
           />
         );
+      case "stock-register":
+        return <StockRegister />;
       case "settings":
         return <Settings />;
       default:

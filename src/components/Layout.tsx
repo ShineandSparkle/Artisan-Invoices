@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
 import {
   FileText,
   Receipt,
@@ -9,17 +8,8 @@ import {
   Settings,
   Menu,
   X,
-  LogOut,
-  User,
-  ChevronDown,
+  Package,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import Footer from "@/components/Footer";
 
 interface LayoutProps {
@@ -33,29 +23,15 @@ const HEADER_HEIGHT = 64; // Increased for navigation
 
 const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
 
   const navigation = [
     { name: "Dashboard", icon: BarChart3, key: "dashboard" },
     { name: "Quotations", icon: FileText, key: "quotations" },
     { name: "Invoices", icon: Receipt, key: "invoices" },
     { name: "Customers", icon: Users, key: "customers" },
+    { name: "Stock Register", icon: Package, key: "stock-register" },
     { name: "Settings", icon: Settings, key: "settings" },
   ];
-
-  const getUserDisplayName = () => {
-    if (user?.user_metadata?.full_name) {
-      return user.user_metadata.full_name;
-    }
-    if (user?.email) {
-      return user.email.split('@')[0];
-    }
-    return 'User';
-  };
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -84,38 +60,8 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
               ))}
             </nav>
 
-            {/* Right side - User menu only */}
-            <div className="flex items-center gap-4">
-              {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 px-3">
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline text-sm">{getUserDisplayName()}</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <div className="px-3 py-2">
-                    <p className="text-sm font-medium">{getUserDisplayName()}</p>
-                    <p className="text-xs text-muted-foreground">{user?.email}</p>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => onPageChange("settings")}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={handleSignOut}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
+            {/* Right side - Mobile menu button only */}
+            <div className="flex items-center">
               {/* Mobile menu button */}
               <Button
                 variant="ghost"
