@@ -256,10 +256,6 @@ const StockRegister = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Stock Register</h1>
-          <p className="text-muted-foreground">Manage inventory for all shirt products</p>
-        </div>
         <div className="flex gap-4">
           <div className="flex items-center gap-2">
             <Label htmlFor="month-select">Month:</Label>
@@ -294,42 +290,42 @@ const StockRegister = () => {
         </div>
       </div>
 
-      <Card>
+      <Card className="w-full">
         <CardHeader>
-          <CardTitle>Product Stock Overview</CardTitle>
+          <CardTitle className="text-2xl">Stock Register - {MONTHS.find(m => m.value === selectedMonth)?.label} {selectedYear}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse min-w-full">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left p-3 font-medium">Product</th>
+                <tr className="border-b-2 border-border">
+                  <th className="text-left p-4 font-semibold text-lg min-w-[120px]">Product</th>
                   {SIZES.map(size => (
-                    <th key={size} className="text-center p-3 font-medium">Size {size}</th>
+                    <th key={size} className="text-center p-4 font-semibold text-lg min-w-[140px]">Size {size}</th>
                   ))}
-                  <th className="text-center p-3 font-medium">Actions</th>
+                  <th className="text-center p-4 font-semibold text-lg min-w-[120px]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
                   <tr key={product.product} className="border-b border-border hover:bg-muted/50">
-                    <td className="p-3 font-medium">{product.product}</td>
+                    <td className="p-4 font-medium text-base">{product.product}</td>
                     {SIZES.map((size) => {
                       const sizeData = product.sizes[size];
                       return (
-                        <td key={size} className="p-3 text-center">
-                          <div className="text-xs space-y-1">
-                            <div>OS: {sizeData.openingStock}</div>
-                            <div>P: {sizeData.production}</div>
-                            <div>S: {sizeData.sales}</div>
-                            <div className="font-bold text-primary">
+                        <td key={size} className="p-4 text-center">
+                          <div className="text-sm space-y-1">
+                            <div className="font-medium">OS: {sizeData.openingStock}</div>
+                            <div className="font-medium">P: {sizeData.production}</div>
+                            <div className="font-medium">S: {sizeData.sales}</div>
+                            <div className="font-bold text-primary text-base">
                               CS: {calculateClosingStock(sizeData.openingStock, sizeData.production, sizeData.sales)}
                             </div>
                           </div>
                         </td>
                       );
                     })}
-                    <td className="p-3">
+                    <td className="p-4">
                       <div className="flex justify-center space-x-2">
                         <Button
                           variant="outline"
