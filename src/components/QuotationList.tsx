@@ -147,33 +147,13 @@ const QuotationList = ({
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {
+                          <DropdownMenuItem onClick={async () => {
+                            const { generateQuotationPrintHTML } = await import('@/utils/printTemplate');
+                            const { useSettings } = await import('@/hooks/useSettings');
+                            const settingsHook = useSettings();
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
-                              const quotationHtml = `
-                                <!DOCTYPE html>
-                                <html>
-                                <head>
-                                  <title>Quotation - ${quotation.quotationNumber}</title>
-                                  <style>
-                                    body { font-family: Arial, sans-serif; padding: 20px; }
-                                    h1 { color: #333; }
-                                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                                    th { background-color: #f2f2f2; }
-                                    .total { font-weight: bold; font-size: 1.2em; }
-                                  </style>
-                                </head>
-                                <body>
-                                  <h1>Quotation ${quotation.quotationNumber}</h1>
-                                  <p><strong>Customer:</strong> ${quotation.customer}</p>
-                                  <p><strong>Date:</strong> ${quotation.date}</p>
-                                  <p><strong>Valid Until:</strong> ${quotation.validUntil}</p>
-                                  <p><strong>Status:</strong> ${quotation.status}</p>
-                                  <p class="total"><strong>Amount:</strong> ₹${quotation.amount.toLocaleString()}</p>
-                                </body>
-                                </html>
-                              `;
+                              const quotationHtml = generateQuotationPrintHTML(quotation.fullQuotation, settingsHook.companySettings);
                               printWindow.document.write(quotationHtml);
                               printWindow.document.close();
                               printWindow.print();

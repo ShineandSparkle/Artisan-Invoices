@@ -2,6 +2,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
+import { useSettings } from "@/hooks/useSettings";
+import { generateInvoicePrintHTML } from "@/utils/printTemplate";
 
 interface InvoiceDetailsProps {
   invoice: any;
@@ -10,7 +14,24 @@ interface InvoiceDetailsProps {
 }
 
 const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
+  const { companySettings } = useSettings();
   if (!invoice) return null;
+
+  const subtotal = invoice.subtotal || 0;
+  const taxAmount = invoice.tax_amount || 0;
+  const totalAmount = invoice.total_amount || invoice.amount || 0;
+  const cgstAmount = taxAmount / 2;
+  const sgstAmount = taxAmount / 2;
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const invoiceHtml = generateInvoicePrintHTML(invoice, companySettings);
+      printWindow.document.write(invoiceHtml);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
@@ -31,132 +52,130 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Invoice Details - {invoice.invoice_number}</DialogTitle>
+          <div className="flex justify-between items-center">
+            <DialogTitle className="text-2xl">TAX INVOICE</DialogTitle>
+            <Button onClick={handlePrint} variant="outline" size="sm">
+              <Printer className="mr-2 h-4 w-4" />
+              Print
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">
-          {/* Header Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Invoice Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Invoice Number:</span>
-                  <span>{invoice.invoice_number}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Date:</span>
-                  <span>{invoice.date}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Due Date:</span>
-                  <span>{invoice.due_date}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Status:</span>
-                  <span>{getStatusBadge(invoice.status)}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Customer Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Name:</span>
-                  <span>{invoice.customer?.name || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Email:</span>
-                  <span>{invoice.customer?.email || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Phone:</span>
-                  <span>{invoice.customer?.phone || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Company:</span>
-                  <span>{invoice.customer?.company || 'N/A'}</span>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Company Details */}
+          <div className="text-center border-b-2 pb-4">
+            <h2 className="text-2xl font-bold">{companySettings.name || 'ARTISAN APPARELS'}</h2>
+            <p className="text-sm">{companySettings.address || 'HIG 9A, APHB Colony, Adoni'}</p>
+            <p className="text-sm">{companySettings.phone}</p>
+            <p className="text-sm font-semibold">GSTIN No - {companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
+          </div>
+          {/* Invoice Info & Customer */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-y-2 py-4">
+            <div>
+              <p className="text-sm"><span className="font-semibold">Bill to:</span> {invoice.customer_name || invoice.customer?.name || 'Customer'}</p>
+              <p className="text-sm"><span className="font-semibold">Place of Supply:</span> Telangana, Code: 36</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm"><span className="font-semibold">INVOICE No:</span> {invoice.invoice_number}</p>
+              <p className="text-sm"><span className="font-semibold">Dated:</span> {invoice.invoice_date || invoice.date}</p>
+              <p className="text-sm mt-2">{getStatusBadge(invoice.status)}</p>
+            </div>
           </div>
 
-          {/* Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+          {/* Items Table */}
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-muted">
+                <tr>
+                  <th className="text-left p-3 border">Description of Goods</th>
+                  <th className="text-center p-3 border">HSN CODE</th>
+                  <th className="text-center p-3 border">QTY</th>
+                  <th className="text-center p-3 border">Units</th>
+                  <th className="text-right p-3 border">RATE (Incl of Tax)</th>
+                  <th className="text-right p-3 border">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
                 {invoice.items && invoice.items.length > 0 ? (
                   invoice.items.map((item: any, index: number) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Description</span>
-                          <p className="mt-1">{item.description}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Quantity</span>
-                          <p className="mt-1">{item.quantity}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Rate</span>
-                          <p className="mt-1">₹{item.rate?.toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-sm text-muted-foreground">Amount</span>
-                          <p className="mt-1 font-semibold">₹{item.amount?.toFixed(2)}</p>
-                        </div>
-                      </div>
-                    </div>
+                    <tr key={index}>
+                      <td className="p-3 border">{item.description}</td>
+                      <td className="text-center p-3 border">{item.hsn_code || 'Shirts'}</td>
+                      <td className="text-center p-3 border">{item.quantity}</td>
+                      <td className="text-center p-3 border">{item.unit || 'Pcs'}</td>
+                      <td className="text-right p-3 border">₹{item.rate?.toFixed(2)}</td>
+                      <td className="text-right p-3 border">₹{item.amount?.toFixed(2)}</td>
+                    </tr>
                   ))
                 ) : (
-                  <p className="text-muted-foreground">No items found</p>
+                  <tr>
+                    <td colSpan={6} className="text-center p-4 text-muted-foreground">No items found</td>
+                  </tr>
                 )}
-              </div>
-            </CardContent>
-          </Card>
+              </tbody>
+            </table>
+          </div>
 
-          {/* Total */}
+          {/* Totals */}
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full">
+              <tbody>
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border font-semibold">Total:</td>
+                  <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border">Discount:</td>
+                  <td className="text-right p-3 border">₹0.00</td>
+                </tr>
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border font-semibold">Taxable Value:</td>
+                  <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
+                </tr>
+                {invoice.tax_type === 'IGST' ? (
+                  <tr>
+                    <td colSpan={5} className="text-right p-3 border">ADD IGST 12%:</td>
+                    <td className="text-right p-3 border">₹{taxAmount.toFixed(2)}</td>
+                  </tr>
+                ) : (
+                  <>
+                    <tr>
+                      <td colSpan={5} className="text-right p-3 border">ADD CGST 6%:</td>
+                      <td className="text-right p-3 border">₹{cgstAmount.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={5} className="text-right p-3 border">ADD SGST 6%:</td>
+                      <td className="text-right p-3 border">₹{sgstAmount.toFixed(2)}</td>
+                    </tr>
+                  </>
+                )}
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border font-bold text-lg">Total:</td>
+                  <td className="text-right p-3 border font-bold text-lg">₹{totalAmount.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Bank Details */}
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-end">
-                <div className="w-64 space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span>₹{invoice.subtotal?.toFixed(2) || '0.00'}</span>
-                  </div>
-                  {invoice.tax_type === 'IGST' ? (
-                    <div className="flex justify-between">
-                      <span>IGST (5%):</span>
-                      <span>₹{invoice.tax_amount?.toFixed(2) || '0.00'}</span>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex justify-between">
-                        <span>CGST (2.5%):</span>
-                        <span>₹{((invoice.tax_amount || 0) / 2).toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>SGST (2.5%):</span>
-                        <span>₹{((invoice.tax_amount || 0) / 2).toFixed(2)}</span>
-                      </div>
-                    </>
-                  )}
-                  <Separator />
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>Total Amount:</span>
-                    <span>₹{invoice.amount?.toLocaleString()}</span>
-                  </div>
-                </div>
+            <CardHeader>
+              <CardTitle className="text-lg">Company's Bank Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="font-semibold">Holder A/c Name:</div>
+                <div>{companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</div>
+                <div className="font-semibold">BANK NAME:</div>
+                <div>{companySettings.bankName || 'HDFC BANK'}</div>
+                <div className="font-semibold">ACCOUNT No:</div>
+                <div>{companySettings.accountNumber || '9998019993333'}</div>
+                <div className="font-semibold">BRANCH:</div>
+                <div>{companySettings.branchAddress || 'ADONI'}</div>
+                <div className="font-semibold">IFSC CODE:</div>
+                <div>{companySettings.routingNumber || 'HDFC0001933'}</div>
               </div>
             </CardContent>
           </Card>

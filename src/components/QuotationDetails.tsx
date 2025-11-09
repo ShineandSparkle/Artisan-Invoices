@@ -1,8 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Download, Send, Eye } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Printer } from "lucide-react";
+import { useSettings } from "@/hooks/useSettings";
+import { generateQuotationPrintHTML } from "@/utils/printTemplate";
 
 interface QuotationDetailsProps {
   quotation: any;
@@ -11,7 +13,24 @@ interface QuotationDetailsProps {
 }
 
 const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps) => {
+  const { companySettings } = useSettings();
   if (!quotation) return null;
+
+  const subtotal = quotation.subtotal || 0;
+  const taxAmount = quotation.tax_amount || 0;
+  const totalAmount = quotation.amount || 0;
+  const cgstAmount = taxAmount / 2;
+  const sgstAmount = taxAmount / 2;
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const quotationHtml = generateQuotationPrintHTML(quotation, companySettings);
+      printWindow.document.write(quotationHtml);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
@@ -33,108 +52,146 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-4">
-            <span>Quotation Details - {quotation.quotation_number}</span>
-            {getStatusBadge(quotation.status)}
-          </DialogTitle>
+          <div className="flex justify-between items-center">
+            <DialogTitle className="text-2xl">QUOTATION</DialogTitle>
+            <Button onClick={handlePrint} variant="outline" size="sm">
+              <Printer className="mr-2 h-4 w-4" />
+              Print
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">
-          {/* Quotation Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Company Details */}
+          <div className="text-center border-b-2 pb-4">
+            <h2 className="text-2xl font-bold">{companySettings.name || 'ARTISAN APPARELS'}</h2>
+            <p className="text-sm">{companySettings.address || 'HIG 9A, APHB Colony, Adoni'}</p>
+            <p className="text-sm">{companySettings.phone}</p>
+            <p className="text-sm font-semibold">GSTIN No - {companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
+          </div>
+
+          {/* Quotation Info & Customer */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-y-2 py-4">
             <div>
-              <h3 className="font-semibold mb-2">Quotation Information</h3>
-              <div className="space-y-2 text-sm">
-                <div><strong>Quotation Number:</strong> {quotation.quotation_number}</div>
-                <div><strong>Date:</strong> {quotation.date}</div>
-                <div><strong>Valid Until:</strong> {quotation.valid_until || "N/A"}</div>
-                <div><strong>Status:</strong> {getStatusBadge(quotation.status)}</div>
-              </div>
+              <p className="text-sm"><span className="font-semibold">To:</span> {quotation.customer?.name || 'Customer'}</p>
+              <p className="text-sm"><span className="font-semibold">Place of Supply:</span> Telangana, Code: 36</p>
             </div>
-            
-            <div>
-              <h3 className="font-semibold mb-2">Customer Information</h3>
-              <div className="space-y-2 text-sm">
-                <div><strong>Customer ID:</strong> {quotation.customer_id || "N/A"}</div>
-              </div>
+            <div className="text-right">
+              <p className="text-sm"><span className="font-semibold">QUOTATION No:</span> {quotation.quotation_number}</p>
+              <p className="text-sm"><span className="font-semibold">Dated:</span> {quotation.date}</p>
+              <p className="text-sm mt-2">{getStatusBadge(quotation.status)}</p>
             </div>
           </div>
 
-          <Separator />
-
-          {/* Items */}
-          <div>
-            <h3 className="font-semibold mb-4">Items</h3>
-            <div className="border rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="text-left p-3">Description</th>
-                    <th className="text-right p-3">Qty</th>
-                    <th className="text-right p-3">Rate</th>
-                    <th className="text-right p-3">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quotation.items?.map((item: any, index: number) => (
-                    <tr key={index} className="border-t">
-                      <td className="p-3">{item.description}</td>
-                      <td className="text-right p-3">{item.quantity}</td>
-                      <td className="text-right p-3">₹{item.rate?.toFixed(2)}</td>
-                      <td className="text-right p-3">₹{item.amount?.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Summary */}
-          <div className="flex justify-end">
-            <div className="w-80 space-y-2">
-              <div className="flex justify-between">
-                <span>Subtotal:</span>
-                <span>₹{quotation.subtotal?.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Tax:</span>
-                <span>₹{quotation.tax_amount?.toFixed(2)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total:</span>
-                <span>₹{quotation.amount?.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Notes */}
-          {quotation.notes && (
-            <div>
-              <h3 className="font-semibold mb-2">Notes</h3>
-              <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-                {quotation.notes}
-              </p>
+          {quotation.valid_until && (
+            <div className="bg-muted p-3 rounded border-l-4 border-primary">
+              <p className="text-sm"><span className="font-semibold">Valid Until:</span> {quotation.valid_until}</p>
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex gap-2 pt-4 border-t">
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Download PDF
-            </Button>
-            <Button variant="outline" size="sm">
-              <Send className="h-4 w-4 mr-2" />
-              Send to Customer
-            </Button>
-            <Button variant="outline" size="sm" onClick={onClose}>
-              <Eye className="h-4 w-4 mr-2" />
-              Close
-            </Button>
+          {/* Items Table */}
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-muted">
+                <tr>
+                  <th className="text-left p-3 border">Description of Goods</th>
+                  <th className="text-center p-3 border">HSN CODE</th>
+                  <th className="text-center p-3 border">QTY</th>
+                  <th className="text-center p-3 border">Units</th>
+                  <th className="text-right p-3 border">RATE (Incl of Tax)</th>
+                  <th className="text-right p-3 border">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {quotation.items?.map((item: any, index: number) => (
+                  <tr key={index}>
+                    <td className="p-3 border">{item.description}</td>
+                    <td className="text-center p-3 border">{item.hsn_code || 'Shirts'}</td>
+                    <td className="text-center p-3 border">{item.quantity}</td>
+                    <td className="text-center p-3 border">{item.unit || 'Pcs'}</td>
+                    <td className="text-right p-3 border">₹{item.rate?.toFixed(2)}</td>
+                    <td className="text-right p-3 border">₹{item.amount?.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+
+          {/* Totals */}
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full">
+              <tbody>
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border font-semibold">Total:</td>
+                  <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border">Discount:</td>
+                  <td className="text-right p-3 border">₹0.00</td>
+                </tr>
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border font-semibold">Taxable Value:</td>
+                  <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
+                </tr>
+                {quotation.tax_type === 'IGST' ? (
+                  <tr>
+                    <td colSpan={5} className="text-right p-3 border">ADD IGST 12%:</td>
+                    <td className="text-right p-3 border">₹{taxAmount.toFixed(2)}</td>
+                  </tr>
+                ) : (
+                  <>
+                    <tr>
+                      <td colSpan={5} className="text-right p-3 border">ADD CGST 6%:</td>
+                      <td className="text-right p-3 border">₹{cgstAmount.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={5} className="text-right p-3 border">ADD SGST 6%:</td>
+                      <td className="text-right p-3 border">₹{sgstAmount.toFixed(2)}</td>
+                    </tr>
+                  </>
+                )}
+                <tr>
+                  <td colSpan={5} className="text-right p-3 border font-bold text-lg">Total:</td>
+                  <td className="text-right p-3 border font-bold text-lg">₹{totalAmount.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Bank Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Company's Bank Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="font-semibold">Holder A/c Name:</div>
+                <div>{companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</div>
+                <div className="font-semibold">BANK NAME:</div>
+                <div>{companySettings.bankName || 'HDFC BANK'}</div>
+                <div className="font-semibold">ACCOUNT No:</div>
+                <div>{companySettings.accountNumber || '9998019993333'}</div>
+                <div className="font-semibold">BRANCH:</div>
+                <div>{companySettings.branchAddress || 'ADONI'}</div>
+                <div className="font-semibold">IFSC CODE:</div>
+                <div>{companySettings.routingNumber || 'HDFC0001933'}</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Notes */}
+          {quotation.notes && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Notes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm whitespace-pre-wrap">{quotation.notes}</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </DialogContent>
     </Dialog>
