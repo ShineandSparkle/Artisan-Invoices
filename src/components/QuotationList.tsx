@@ -24,7 +24,6 @@ import {
   Edit, 
   FileText, 
   Trash2,
-  Download,
   Send,
   Printer
 } from "lucide-react";
@@ -37,9 +36,7 @@ interface QuotationListProps {
   onQuotationToInvoice: (quotationId: string) => void;
   onUpdateStatus: (quotationId: string, status: string) => void;
   onDelete: (quotationId: string) => void;
-  onDownloadPDF?: (id: string) => void;
   onSendToCustomer?: (id: string) => void;
-  onPrintQuotation?: (id: string) => void;
 }
 
 const QuotationList = ({ 
@@ -50,9 +47,7 @@ const QuotationList = ({
   onQuotationToInvoice, 
   onUpdateStatus, 
   onDelete,
-  onDownloadPDF,
-  onSendToCustomer,
-  onPrintQuotation 
+  onSendToCustomer
 }: QuotationListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -152,11 +147,38 @@ const QuotationList = ({
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDownloadPDF?.(quotation.id)}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download PDF
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onPrintQuotation?.(quotation.id)}>
+                          <DropdownMenuItem onClick={() => {
+                            const printWindow = window.open('', '_blank');
+                            if (printWindow) {
+                              const quotationHtml = `
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                  <title>Quotation - ${quotation.quotationNumber}</title>
+                                  <style>
+                                    body { font-family: Arial, sans-serif; padding: 20px; }
+                                    h1 { color: #333; }
+                                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                                    th { background-color: #f2f2f2; }
+                                    .total { font-weight: bold; font-size: 1.2em; }
+                                  </style>
+                                </head>
+                                <body>
+                                  <h1>Quotation ${quotation.quotationNumber}</h1>
+                                  <p><strong>Customer:</strong> ${quotation.customer}</p>
+                                  <p><strong>Date:</strong> ${quotation.date}</p>
+                                  <p><strong>Valid Until:</strong> ${quotation.validUntil}</p>
+                                  <p><strong>Status:</strong> ${quotation.status}</p>
+                                  <p class="total"><strong>Amount:</strong> ₹${quotation.amount.toLocaleString()}</p>
+                                </body>
+                                </html>
+                              `;
+                              printWindow.document.write(quotationHtml);
+                              printWindow.document.close();
+                              printWindow.print();
+                            }
+                          }}>
                             <Printer className="mr-2 h-4 w-4" />
                             Print
                           </DropdownMenuItem>

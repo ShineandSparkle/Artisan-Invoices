@@ -24,7 +24,6 @@ import {
   Edit, 
   Receipt, 
   Trash2,
-  Download,
   Send,
   CheckCircle,
   Clock
@@ -38,7 +37,6 @@ interface InvoiceListProps {
   onDelete: (invoiceId: string) => void;
   onMarkAsPaid?: (invoiceId: string) => void;
   onSendReminder?: (invoiceId: string) => void;
-  onDownloadPDF?: (id: string) => void;
   onSendToCustomer?: (id: string) => void;
 }
 
@@ -50,7 +48,6 @@ const InvoiceList = ({
   onDelete,
   onMarkAsPaid,
   onSendReminder,
-  onDownloadPDF,
   onSendToCustomer
 }: InvoiceListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -165,9 +162,40 @@ const InvoiceList = ({
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDownloadPDF?.(invoice.id)}>
-                              <Download className="mr-2 h-4 w-4" />
-                              Download PDF
+                            <DropdownMenuItem onClick={() => {
+                              const printWindow = window.open('', '_blank');
+                              if (printWindow) {
+                                const invoiceHtml = `
+                                  <!DOCTYPE html>
+                                  <html>
+                                  <head>
+                                    <title>Invoice - ${invoice.invoiceNumber}</title>
+                                    <style>
+                                      body { font-family: Arial, sans-serif; padding: 20px; }
+                                      h1 { color: #333; }
+                                      table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                                      th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                                      th { background-color: #f2f2f2; }
+                                      .total { font-weight: bold; font-size: 1.2em; }
+                                    </style>
+                                  </head>
+                                  <body>
+                                    <h1>Invoice ${invoice.invoiceNumber}</h1>
+                                    <p><strong>Customer:</strong> ${invoice.customer}</p>
+                                    <p><strong>Issue Date:</strong> ${invoice.date}</p>
+                                    <p><strong>Due Date:</strong> ${invoice.dueDate}</p>
+                                    <p><strong>Status:</strong> ${invoice.status}</p>
+                                    <p class="total"><strong>Amount:</strong> ₹${invoice.amount.toLocaleString()}</p>
+                                  </body>
+                                  </html>
+                                `;
+                                printWindow.document.write(invoiceHtml);
+                                printWindow.document.close();
+                                printWindow.print();
+                              }
+                            }}>
+                              <Receipt className="mr-2 h-4 w-4" />
+                              Print
                             </DropdownMenuItem>
                             {(invoice.status === "save" || invoice.status === "pending") && (
                               <DropdownMenuItem onClick={() => onSendReminder?.(invoice.id)}>

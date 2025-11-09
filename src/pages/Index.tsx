@@ -187,29 +187,6 @@ const Index = () => {
     });
   };
 
-  const handleDownloadPDF = (id: string) => {
-    const invoice = invoices.find(i => i.id === id || i.invoice_number === id);
-    
-    if (invoice) {
-      // Simple text download for invoices (can be enhanced later)
-      const content = `Invoice: ${invoice.invoice_number}\nCustomer: ${invoice.customer_name}\nAmount: ₹${invoice.total_amount}`;
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${invoice.invoice_number}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "PDF Downloaded",
-        description: "Invoice has been downloaded."
-      });
-    }
-  };
-
   const handleViewQuotation = (id: string) => {
     const quotation = quotations.find(q => q.id === id || q.quotation_number === id);
     if (quotation) {
@@ -265,29 +242,6 @@ const Index = () => {
     }
   };
 
-  const handleDownloadQuotationPDF = (id: string) => {
-    const quotation = quotations.find(q => q.id === id || q.quotation_number === id);
-    
-    if (quotation) {
-      // Simple text download for quotations (can be enhanced later)
-      const content = `Quotation: ${quotation.quotation_number}\nAmount: ₹${quotation.amount}`;
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${quotation.quotation_number}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "PDF Downloaded",
-        description: "Quotation has been downloaded."
-      });
-    }
-  };
-
   const handleSendQuotationToCustomer = async (id: string) => {
     const updatedQuotation = await updateQuotation(id, { status: "sent" });
     if (updatedQuotation) {
@@ -323,7 +277,6 @@ const Index = () => {
             onDelete={deleteInvoice}
             onMarkAsPaid={handleMarkAsPaid}
             onSendReminder={handleSendReminder}
-            onDownloadPDF={handleDownloadPDF}
             onSendToCustomer={handleSendQuotationToCustomer}
           />
         );
@@ -418,7 +371,6 @@ const Index = () => {
               }
             }}
             onSendToCustomer={handleSendQuotationToCustomer}
-            onDownloadPDF={handleDownloadQuotationPDF}
           />
         );
       case "quotation-form":
