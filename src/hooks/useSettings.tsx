@@ -35,24 +35,24 @@ export interface NotificationSettings {
 export const useSettings = () => {
   const { toast } = useToast();
   const [companySettings, setCompanySettings] = useState<CompanySettings>({
-    name: "Your Company Name",
-    email: "info@yourcompany.com",
-    phone: "+91 98765 43210",
+    name: "Artisan Apparels",
+    email: "info@artisanapparels.com",
+    phone: "+91 85006 06000",
     address: "123 Business Street, City, State 12345",
-    website: "www.yourcompany.com",
-    taxNumber: "GSTIN123456789",
-    logo: "",
-    bankName: "",
-    accountNumber: "",
+    website: "www.artisanapparels.com",
+    taxNumber: "37AGDPR6197G1ZW",
+    logo: "https://i.ibb.co/p6NHDnrb/Logo-IAM-Ratan.png",
+    bankName: "HDFC BANK",
+    accountNumber: "9998019993333",
     routingNumber: "",
-    accountHolderName: "",
-    branchAddress: "",
-    swiftCode: ""
+    accountHolderName: "ARTISAN APPARELS",
+    branchAddress: "ADONI",
+    swiftCode: "HDFC0001933"
   });
 
   const [invoiceSettings, setInvoiceSettings] = useState<InvoiceSettings>({
-    prefix: "INV",
-    quotationPrefix: "QUO",
+    prefix: "INV/2526/",
+    quotationPrefix: "QUO/2526/",
     defaultTerms: "Payment is due within 30 days of invoice date.",
     defaultNotes: "Thank you for your business!",
     currency: "INR"
