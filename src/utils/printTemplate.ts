@@ -26,7 +26,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
   const totalAmount = invoice.total_amount || invoice.amount || 0;
   const cgstAmount = taxAmount / 2;
   const sgstAmount = taxAmount / 2;
-  const taxRate = invoice.tax_type === 'IGST' ? 12 : 6; // 12% IGST or 6% CGST + 6% SGST
+  const taxRate = invoice.tax_type === 'IGST' ? 18 : 9; // 18% IGST or 9% CGST + 9% SGST
   
   const amountInWords = numberToWords(Math.floor(totalAmount));
 
@@ -227,10 +227,9 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
           </tr>
         </table>
       </div>
-
       <div class="signature">
         <p>For ${companySettings.name || 'ARTISAN APPARELS'}</p>
-        <br><br><br>
+        <br><br>
         <p>Authorised Signatory</p>
       </div>
     </body>
@@ -244,7 +243,7 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
   const totalAmount = quotation.amount || 0;
   const cgstAmount = taxAmount / 2;
   const sgstAmount = taxAmount / 2;
-  const taxRate = quotation.tax_type === 'IGST' ? 12 : 6;
+  const taxRate = quotation.tax_type === 'IGST' ? 18 : 9;
   
   const amountInWords = numberToWords(Math.floor(totalAmount));
 

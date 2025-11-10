@@ -178,7 +178,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     onChange={(e) => handleChange('taxType', e.target.value)}
                     className="mr-2"
                   />
-                  IGST 12%
+                  IGST 18%
                 </Label>
                 <Label className="flex items-center">
                   <input
@@ -189,7 +189,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     onChange={(e) => handleChange('taxType', e.target.value)}
                     className="mr-2"
                   />
-                  CGST 6% & SGST 6%
+                  CGST 9% & SGST 9%
                 </Label>
               </div>
             </div>
@@ -301,17 +301,17 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                 </div>
                 {formData.taxType === 'IGST' ? (
                   <div className="flex justify-between">
-                    <span>IGST (5%):</span>
+                    <span>IGST (18%):</span>
                     <span>₹{taxAmount.toFixed(2)}</span>
                   </div>
                 ) : (
                   <>
                     <div className="flex justify-between">
-                      <span>CGST (2.5%):</span>
+                      <span>CGST (9%):</span>
                       <span>₹{(taxAmount / 2).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>SGST (2.5%):</span>
+                      <span>SGST (9%):</span>
                       <span>₹{(taxAmount / 2).toFixed(2)}</span>
                     </div>
                   </>

@@ -146,17 +146,17 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
                 </tr>
                 {invoice.tax_type === 'IGST' ? (
                   <tr>
-                    <td colSpan={5} className="text-right p-3 border">ADD IGST 12%:</td>
+                    <td colSpan={5} className="text-right p-3 border">ADD IGST 18%:</td>
                     <td className="text-right p-3 border">₹{taxAmount.toFixed(2)}</td>
                   </tr>
                 ) : (
                   <>
                     <tr>
-                      <td colSpan={5} className="text-right p-3 border">ADD CGST 6%:</td>
+                      <td colSpan={5} className="text-right p-3 border">ADD CGST 9%:</td>
                       <td className="text-right p-3 border">₹{cgstAmount.toFixed(2)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={5} className="text-right p-3 border">ADD SGST 6%:</td>
+                      <td colSpan={5} className="text-right p-3 border">ADD SGST 9%:</td>
                       <td className="text-right p-3 border">₹{sgstAmount.toFixed(2)}</td>
                     </tr>
                   </>
