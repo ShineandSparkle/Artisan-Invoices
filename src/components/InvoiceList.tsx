@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useSettings } from "@/hooks/useSettings";
 import {
   Table,
   TableBody,
@@ -51,6 +52,7 @@ const InvoiceList = ({
   onSendToCustomer
 }: InvoiceListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { companySettings } = useSettings();
 
   const displayInvoices = invoices.map(i => ({
     id: i.id,
@@ -164,11 +166,9 @@ const InvoiceList = ({
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={async () => {
                               const { generateInvoicePrintHTML } = await import('@/utils/printTemplate');
-                              const { useSettings } = await import('@/hooks/useSettings');
-                              const settingsHook = useSettings();
                               const printWindow = window.open('', '_blank');
                               if (printWindow) {
-                                const invoiceHtml = generateInvoicePrintHTML(invoice.fullInvoice, settingsHook.companySettings);
+                                const invoiceHtml = generateInvoicePrintHTML(invoice.fullInvoice, companySettings);
                                 printWindow.document.write(invoiceHtml);
                                 printWindow.document.close();
                                 printWindow.print();

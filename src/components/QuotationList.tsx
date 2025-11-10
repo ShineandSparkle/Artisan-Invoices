@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useSettings } from "@/hooks/useSettings";
 import {
   Table,
   TableBody,
@@ -50,6 +51,7 @@ const QuotationList = ({
   onSendToCustomer
 }: QuotationListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { companySettings } = useSettings();
 
   const displayQuotations = quotations.map(q => ({
     id: q.id,
@@ -149,11 +151,9 @@ const QuotationList = ({
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={async () => {
                             const { generateQuotationPrintHTML } = await import('@/utils/printTemplate');
-                            const { useSettings } = await import('@/hooks/useSettings');
-                            const settingsHook = useSettings();
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
-                              const quotationHtml = generateQuotationPrintHTML(quotation.fullQuotation, settingsHook.companySettings);
+                              const quotationHtml = generateQuotationPrintHTML(quotation.fullQuotation, companySettings);
                               printWindow.document.write(quotationHtml);
                               printWindow.document.close();
                               printWindow.print();
