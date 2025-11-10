@@ -5,6 +5,7 @@ export interface Quotation {
   id: string;
   quotation_number: string;
   customer_id: string | null;
+  customer?: Customer | null;
   date: string;
   valid_until: string | null;
   amount: number;
@@ -83,10 +84,13 @@ export const useSupabaseData = () => {
         .select("*")
         .order("created_at", { ascending: false });
 
-      // Fetch quotations
+      // Fetch quotations with customer data
       const { data: quotationsData } = await supabase
         .from("quotations")
-        .select("*")
+        .select(`
+          *,
+          customer:customers(*)
+        `)
         .order("created_at", { ascending: false });
 
       // Fetch payments
