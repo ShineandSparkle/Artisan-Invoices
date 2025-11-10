@@ -142,9 +142,11 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
   return (
     <Card className="max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle>
-          {mode === 'edit' ? 'Edit Invoice' : 'Create New Invoice'}
-        </CardTitle>
+        <div className="flex justify-center">
+          <CardTitle>
+            {mode === 'edit' ? 'Edit Invoice' : 'Create New Invoice'}
+          </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">

@@ -122,9 +122,12 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>{mode === 'edit' ? 'Edit Quotation' : 'Create New Quotation'}</CardTitle>
-        </CardHeader>
+        <div className="flex justify-center">
+          <CardTitle>
+            {mode === 'edit' ? 'Edit Quotation' : 'Create New Quotation'}
+          </CardTitle>
+        </div>
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Customer and Date Info */}
