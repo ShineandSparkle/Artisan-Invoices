@@ -128,7 +128,10 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
       <div class="invoice-info">
         <div class="bill-to">
           <p><strong>Bill to:</strong> ${invoice.customer_name || invoice.customer?.name || 'Customer'}</p>
-          <p><strong>Place of Supply:</strong> Telangana, Code: 36</p>
+          <p>${invoice.customer_phone || invoice.customer?.phone || invoice.customer?.mobile || invoice.customer?.contact?.phone || ''}</p>
+          <p>${invoice.customer_email || invoice.customer?.email || invoice.customer?.contact?.email || ''}</p>
+          <p>${invoice.customer_address || invoice.customer?.address || invoice.customer?.billing_address || invoice.customer?.contact?.address || ''}</p>
+          <p>${invoice.customer_gst_no || invoice.customer?.gst_no || invoice.customer?.gst || invoice.customer?.gstin || invoice.customer?.tax_id || ''}</p>
         </div>
         <div>
           <p><strong>INVOICE No:</strong> ${invoice.invoice_number}</p>
@@ -348,8 +351,11 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
 
       <div class="quotation-info">
         <div class="bill-to">
-          <p><strong>To:</strong> ${quotation.customer?.name || 'Customer'}</p>
-          <p><strong>Place of Supply:</strong> Telangana, Code: 36</p>
+          <p><strong>To:</strong><br>${quotation.customer?.name || 'Customer'}</p>
+          <p>${quotation.customer?.phone || quotation.customer_phone || quotation.customer?.mobile || quotation.customer?.contact?.phone || ''}</p>
+          <p>${quotation.customer?.email || quotation.customer_email || quotation.customer?.contact?.email || ''}</p>
+          <p>${quotation.customer?.address || quotation.customer_address || quotation.customer?.billing_address || quotation.customer?.contact?.address || ''}</p>
+          <p>${quotation.customer?.gst_no || quotation.customer_gst_no || quotation.customer?.gst || quotation.customer?.gstin || quotation.customer?.tax_id || ''}</p>
         </div>
         <div>
           <p><strong>QUOTATION No:</strong> ${quotation.quotation_number}</p>

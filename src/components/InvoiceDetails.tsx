@@ -54,13 +54,19 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex justify-between items-center">
-            <DialogTitle className="text-2xl">TAX INVOICE</DialogTitle>
-            <Button onClick={handlePrint} variant="outline" size="sm">
-              <Printer className="mr-2 h-4 w-4" />
-              Print
-            </Button>
-          </div>
+        <div className="relative flex items-center justify-center">
+          <DialogTitle className="text-2xl font-semibold">TAX INVOICE</DialogTitle>
+          <Button
+            onClick={handlePrint}
+            variant="outline"
+            size="sm"
+            className="absolute right-0"
+          >
+            <Printer className="mr-2 h-4 w-4" />
+            Print
+          </Button>
+        </div>
+
         </DialogHeader>
         
         <div className="space-y-6">
@@ -73,9 +79,14 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
           {/* Invoice Info & Customer */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-y-2 py-4">
             <div>
-              <p className="text-sm"><span className="font-semibold">Bill to:</span> {invoice.customer_name || invoice.customer?.name || 'Customer'}</p>
-              <p className="text-sm"><span className="font-semibold">Place of Supply:</span> Telangana, Code: 36</p>
-            </div>
+              <p className="text-sm"><span className="font-semibold">Bill to:</span><br />{invoice.customer_name || invoice.customer?.name || "Customer"}</p>
+                <div className="space-y-1">
+                  <p className="text-sm">{invoice.customer_phone || invoice.customer?.phone || invoice.customer?.mobile || invoice.customer?.contact?.phone || ""}</p>
+                  <p className="text-sm">{invoice.customer_email || invoice.customer?.email || invoice.customer?.contact?.email || ""}</p>
+                  <p className="text-sm">{invoice.customer_address || invoice.customer?.address || invoice.customer?.billing_address || invoice.customer?.contact?.address || ""}</p>
+                  <p className="text-sm">{invoice.customer_gst || invoice.customer?.gst || invoice.customer?.gstin || invoice.customer?.tax_id || ""}</p>
+                </div>
+           </div>
             <div className="text-right">
               <p className="text-sm"><span className="font-semibold">INVOICE No:</span> {invoice.invoice_number}</p>
               <p className="text-sm"><span className="font-semibold">Dated:</span> {invoice.invoice_date || invoice.date}</p>

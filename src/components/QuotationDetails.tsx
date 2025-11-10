@@ -54,13 +54,19 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex justify-between items-center">
-            <DialogTitle className="text-2xl">QUOTATION</DialogTitle>
-            <Button onClick={handlePrint} variant="outline" size="sm">
-              <Printer className="mr-2 h-4 w-4" />
-              Print
-            </Button>
-          </div>
+        <div className="relative flex items-center justify-center">
+          <DialogTitle className="text-2xl font-semibold">QUOTATION</DialogTitle>
+          <Button
+            onClick={handlePrint}
+            variant="outline"
+            size="sm"
+            className="absolute right-0"
+          >
+            <Printer className="mr-2 h-4 w-4" />
+            Print
+          </Button>
+        </div>
+
         </DialogHeader>
         
         <div className="space-y-6">
@@ -72,11 +78,14 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
           </div>
 
           {/* Quotation Info & Customer */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-y-2 py-4">
-            <div>
-              <p className="text-sm"><span className="font-semibold">To:</span> {quotation.customer?.name || 'Customer'}</p>
-              <p className="text-sm"><span className="font-semibold">Place of Supply:</span> Telangana, Code: 36</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-y-2 py-4">         
+              <div>
+              <p className="text-sm"><span className="font-semibold">To:</span><br />{quotation.customer_name || quotation.customer?.name || "Customer"}</p>
+                <p className="text-sm">{quotation.customer_phone || quotation.customer?.phone || quotation.customer?.mobile || quotation.customer?.contact?.phone || ""}</p>
+                <p className="text-sm">{quotation.customer_email || quotation.customer?.email || quotation.customer?.contact?.email || ""}</p>
+                <p className="text-sm">{quotation.customer_address || quotation.customer?.address || quotation.customer?.billing_address || quotation.customer?.contact?.address || ""}</p>
+                <p className="text-sm">{quotation.customer_gst_no || quotation.customer?.gst_no || quotation.customer?.gst || quotation.customer?.gstin || quotation.customer?.tax_id || ""}</p>
+              </div>
             <div className="text-right">
               <p className="text-sm"><span className="font-semibold">QUOTATION No:</span> {quotation.quotation_number}</p>
               <p className="text-sm"><span className="font-semibold">Dated:</span> {quotation.date}</p>
