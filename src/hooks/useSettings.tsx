@@ -38,7 +38,7 @@ export const useSettings = () => {
     name: "Artisan Apparels",
     email: "info@artisanapparels.com",
     phone: "+91 85006 06000",
-    address: "123 Business Street, City, State 12345",
+    address: "HIG 9A, APHB Colony, Adoni, Kurnool District, Pincode - 518301",
     website: "www.artisanapparels.com",
     taxNumber: "37AGDPR6197G1ZW",
     logo: "https://i.ibb.co/p6NHDnrb/Logo-IAM-Ratan.png",

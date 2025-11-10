@@ -122,7 +122,6 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
       <div class="company-details">
         <h2>${companySettings.name || 'ARTISAN APPARELS'}</h2>
         <p>${companySettings.address || 'HIG 9A, APHB Colony, Adoni'}</p>
-        <p>${companySettings.phone || ''}</p>
         <p>GSTIN No - ${companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
       </div>
 
@@ -344,7 +343,6 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
       <div class="company-details">
         <h2>${companySettings.name || 'ARTISAN APPARELS'}</h2>
         <p>${companySettings.address || 'HIG 9A, APHB Colony, Adoni'}</p>
-        <p>${companySettings.phone || ''}</p>
         <p>GSTIN No - ${companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
       </div>
 

@@ -68,7 +68,6 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
           <div className="text-center border-b-2 pb-4">
             <h2 className="text-2xl font-bold">{companySettings.name || 'ARTISAN APPARELS'}</h2>
             <p className="text-sm">{companySettings.address || 'HIG 9A, APHB Colony, Adoni'}</p>
-            <p className="text-sm">{companySettings.phone}</p>
             <p className="text-sm font-semibold">GSTIN No - {companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
           </div>
           {/* Invoice Info & Customer */}

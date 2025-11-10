@@ -58,7 +58,7 @@ export const generateQuotationPDF = (quotation: QuotationData, companySettings: 
 
   doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);
-  const contactLine = `${companySettings.address || ""} | ${companySettings.phone || ""} | ${companySettings.email || ""}`;
+  const contactLine = `${companySettings.address || ""} | ${companySettings.email || ""}`;
   doc.text(contactLine, pageWidth / 2, yPosition, { align: "center" });
   yPosition += 5;
 
