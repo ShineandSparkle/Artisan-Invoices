@@ -145,7 +145,7 @@ const InvoiceList = ({
                       <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                       <TableCell>{invoice.date}</TableCell>
                       <TableCell className={invoice.status === "overdue" ? "text-destructive font-medium" : ""}>
-                        {invoice.dueDate}
+                        {invoice.dueDate || "-"}
                       </TableCell>
                       <TableCell>{invoice.paidDate}</TableCell>
                       <TableCell className="text-right">

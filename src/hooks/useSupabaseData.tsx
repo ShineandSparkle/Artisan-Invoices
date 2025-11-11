@@ -180,7 +180,7 @@ export const useSupabaseData = () => {
     return null;
   };
 
-  const addInvoice = async (invoiceData: Omit<Invoice, "id" | "invoice_number" | "created_at" | "updated_at">) => {
+  const addInvoice = async (invoiceData: Omit<Invoice, "id" | "invoice_number" | "created_at" | "updated_at">, invoicePrefix: string = "INV-") => {
     if (!user) {
       toast({
         title: "Error",
@@ -196,7 +196,7 @@ export const useSupabaseData = () => {
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 
-    const invoiceNumber = `INV-${String((count || 0) + 1).padStart(3, '0')}`;
+    const invoiceNumber = `${invoicePrefix}${String((count || 0) + 1).padStart(3, '0')}`;
 
     const { data, error } = await supabase
       .from("invoices")

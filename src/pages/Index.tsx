@@ -139,7 +139,7 @@ const Index = () => {
 
   const handleSubmitInvoice = async (invoiceData: any) => {
     try {
-      const newInvoice = await addInvoice(invoiceData);
+      const newInvoice = await addInvoice(invoiceData, invoiceSettings.prefix);
       if (newInvoice) {
         toast({
           title: "Invoice created",
