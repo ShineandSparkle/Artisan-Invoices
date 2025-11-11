@@ -67,15 +67,17 @@ const InvoiceList = ({
   }));
 
   const getStatusBadge = (status: string) => {
+    const statusLower = status?.toLowerCase() || 'save';
     const variants: Record<string, any> = {
       save: { variant: "secondary", label: "Save", icon: Edit },
+      draft: { variant: "secondary", label: "Draft", icon: Edit },
       sent: { variant: "outline", label: "Sent", icon: Send },
       pending: { variant: "secondary", label: "Pending", icon: Clock },
       paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground", icon: CheckCircle },
       overdue: { variant: "destructive", label: "Overdue", icon: Clock }
     };
 
-    const config = variants[status] || variants.save;
+    const config = variants[statusLower] || variants.save;
     const Icon = config.icon;
     return (
       <Badge variant={config.variant} className={config.className}>
@@ -223,7 +225,7 @@ const InvoiceList = ({
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-success">
               ₹{filteredInvoices
-                .filter(i => i.status === "paid")
+                .filter(i => i.status?.toLowerCase() === "paid")
                 .reduce((sum, i) => sum + (i.amount || 0), 0)
                 .toLocaleString()}
             </div>
@@ -234,7 +236,10 @@ const InvoiceList = ({
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-primary">
               ₹{filteredInvoices
-                .filter(i => i.status === "pending" || i.status === "sent")
+                .filter(i => {
+                  const status = i.status?.toLowerCase();
+                  return status === "pending" || status === "sent";
+                })
                 .reduce((sum, i) => sum + (i.amount || 0), 0)
                 .toLocaleString()}
             </div>
@@ -245,7 +250,7 @@ const InvoiceList = ({
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-destructive">
               ₹{filteredInvoices
-                .filter(i => i.status === "overdue")
+                .filter(i => i.status?.toLowerCase() === "overdue")
                 .reduce((sum, i) => sum + (i.amount || 0), 0)
                 .toLocaleString()}
             </div>
@@ -255,7 +260,10 @@ const InvoiceList = ({
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-muted-foreground">
-              {filteredInvoices.filter(i => i.status === "save").length}
+              {filteredInvoices.filter(i => {
+                const status = i.status?.toLowerCase();
+                return status === "save" || status === "draft";
+              }).length}
             </div>
             <p className="text-xs text-muted-foreground">Saved Drafts</p>
           </CardContent>

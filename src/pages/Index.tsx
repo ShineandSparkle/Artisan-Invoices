@@ -161,7 +161,11 @@ const Index = () => {
 
   const handleMarkAsPaid = async (invoiceId: string) => {
     try {
-      const updatedInvoice = await updateInvoice(invoiceId, { status: "Paid" });
+      const currentDate = new Date().toISOString().split('T')[0];
+      const updatedInvoice = await updateInvoice(invoiceId, { 
+        status: "paid",
+        paid_date: currentDate
+      });
       if (updatedInvoice) {
         toast({
           title: "Invoice marked as paid",

@@ -56,6 +56,7 @@ export interface Invoice {
   total_amount: number;
   invoice_date: string;
   due_date?: string;
+  paid_date?: string;
   status: string;
   items: any[];
   notes?: string;
