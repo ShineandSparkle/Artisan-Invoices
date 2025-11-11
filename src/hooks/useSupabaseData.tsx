@@ -111,7 +111,7 @@ export const useSupabaseData = () => {
         .from("quotations")
         .select(`
           *,
-          customer:customers(*)
+          customer:customer_id(*)
         `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -390,7 +390,7 @@ export const useSupabaseData = () => {
     return null;
   };
 
-  const addQuotation = async (quotationData: Omit<Quotation, "id" | "quotation_number" | "created_at" | "updated_at">) => {
+  const addQuotation = async (quotationData: Omit<Quotation, "id" | "quotation_number" | "created_at" | "updated_at">, quotationPrefix?: string) => {
     if (!user) {
       toast({
         title: "Error",
@@ -400,13 +400,14 @@ export const useSupabaseData = () => {
       return null;
     }
 
-    // Generate quotation number
+    // Generate quotation number with prefix from settings
     const { count } = await supabase
       .from("quotations")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 
-    const quotationNumber = `QUO-${String((count || 0) + 1).padStart(3, '0')}`;
+    const prefix = quotationPrefix || "QUO/2526/";
+    const quotationNumber = `${prefix}${String((count || 0) + 1).padStart(3, '0')}`;
 
     const { data, error } = await supabase
       .from("quotations")

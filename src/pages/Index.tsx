@@ -23,7 +23,7 @@ const Index = () => {
   const [viewingInvoice, setViewingInvoice] = useState(null);
   const [viewingQuotation, setViewingQuotation] = useState(null);
   const { toast } = useToast();
-  const { companySettings } = useSettings();
+  const { companySettings, invoiceSettings } = useSettings();
   const {
     customers,
     invoices,
@@ -201,7 +201,7 @@ const Index = () => {
 
   const handleSubmitQuotation = async (quotationData: any) => {
     try {
-      const newQuotation = await addQuotation(quotationData);
+      const newQuotation = await addQuotation(quotationData, invoiceSettings.quotationPrefix);
       if (newQuotation) {
         toast({
           title: "Quotation created",
@@ -246,8 +246,8 @@ const Index = () => {
     const updatedQuotation = await updateQuotation(id, { status: "sent" });
     if (updatedQuotation) {
       toast({
-        title: "Quotation sent",
-        description: `Quotation ${updatedQuotation.quotation_number} has been sent to the customer.`
+        title: "Status Updated",
+        description: `Quotation ${updatedQuotation.quotation_number} has been marked as sent. Note: This only updates the status - email functionality coming soon.`
       });
     }
   };
@@ -354,12 +354,47 @@ const Index = () => {
             onViewQuotation={handleViewQuotation}
             onEditQuotation={handleEditQuotation}
             onDelete={deleteQuotation}
-            onQuotationToInvoice={(quotationId) => {
-              // Convert quotation to invoice - future enhancement
-              toast({
-                title: "Feature coming soon",
-                description: "Converting quotations to invoices will be available soon."
-              });
+            onQuotationToInvoice={async (quotationId) => {
+              const quotation = quotations.find(q => q.id === quotationId);
+              if (!quotation) return;
+
+              const customer = customers.find(c => c.id === quotation.customer_id);
+              if (!customer) {
+                toast({
+                  title: "Error",
+                  description: "Customer not found for this quotation.",
+                  variant: "destructive"
+                });
+                return;
+              }
+
+              const invoiceData = {
+                customer_name: customer.name,
+                customer_email: customer.email || "",
+                customer_phone: customer.phone || "",
+                customer_address: customer.address || "",
+                customer_company: customer.company || "",
+                customer_gst_no: customer.gst_no || "",
+                customer_city: customer.city || "",
+                customer_state: customer.state || "",
+                customer_pincode: customer.pincode || "",
+                subtotal: quotation.subtotal,
+                tax_amount: quotation.tax_amount,
+                total_amount: quotation.amount,
+                invoice_date: new Date().toISOString().split('T')[0],
+                status: "Unpaid",
+                items: quotation.items,
+                notes: quotation.notes || ""
+              };
+
+              const newInvoice = await addInvoice(invoiceData);
+              if (newInvoice) {
+                toast({
+                  title: "Invoice created",
+                  description: `Invoice ${newInvoice.invoice_number} has been created from quotation ${quotation.quotation_number}.`
+                });
+                setCurrentPage("invoices");
+              }
             }}
             onUpdateStatus={async (quotationId, status) => {
               const updated = await updateQuotation(quotationId, { status });

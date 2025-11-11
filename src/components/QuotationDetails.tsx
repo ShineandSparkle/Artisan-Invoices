@@ -80,11 +80,18 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
           {/* Quotation Info & Customer */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-y-2 py-4">         
               <div>
-              <p className="text-sm"><span className="font-semibold">To:</span><br />{quotation.customer_name || quotation.customer?.name || "Customer"}</p>
-                <p className="text-sm">{quotation.customer_phone || quotation.customer?.phone || quotation.customer?.mobile || quotation.customer?.contact?.phone || ""}</p>
-                <p className="text-sm">{quotation.customer_email || quotation.customer?.email || quotation.customer?.contact?.email || ""}</p>
-                <p className="text-sm">{quotation.customer_address || quotation.customer?.address || quotation.customer?.billing_address || quotation.customer?.contact?.address || ""}</p>
-                <p className="text-sm">{quotation.customer_gst_no || quotation.customer?.gst_no || quotation.customer?.gst || quotation.customer?.gstin || quotation.customer?.tax_id || ""}</p>
+              <p className="text-sm"><span className="font-semibold">To:</span></p>
+              <p className="text-sm font-semibold">{quotation.customer?.name || "Customer"}</p>
+              {quotation.customer?.company && <p className="text-sm">{quotation.customer.company}</p>}
+              {quotation.customer?.email && <p className="text-sm">Email: {quotation.customer.email}</p>}
+              {quotation.customer?.phone && <p className="text-sm">Contact: {quotation.customer.phone}</p>}
+              {quotation.customer?.gst_no && <p className="text-sm">GST No: {quotation.customer.gst_no}</p>}
+              {quotation.customer?.address && <p className="text-sm">Address: {quotation.customer.address}</p>}
+              {(quotation.customer?.city || quotation.customer?.state || quotation.customer?.pincode) && (
+                <p className="text-sm">
+                  {[quotation.customer?.city, quotation.customer?.state, quotation.customer?.pincode].filter(Boolean).join(', ')}
+                </p>
+              )}
               </div>
             <div className="text-right">
               <p className="text-sm"><span className="font-semibold">QUOTATION No:</span> {quotation.quotation_number}</p>

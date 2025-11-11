@@ -317,12 +317,14 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
           margin: 20px 0;
         }
         .bank-table {
-          width: 50%;
+          width: 100%;
+        }
+        .bank-table td {
+          padding: 4px 8px;
         }
         .signature {
-          text-align: right;
-          margin-top: 60px;
-          padding-right: 40px;
+          text-align: center;
+          margin-top: 20px;
         }
         .bold { font-weight: bold; }
         .validity {
@@ -344,17 +346,20 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
 
       <div class="company-details">
         <h2>${companySettings.name || 'ARTISAN APPARELS'}</h2>
-        <p>${companySettings.address || 'HIG 9A, APHB Colony, Adoni'}</p>
+        <p>${(companySettings.address || 'HIG 9A, APHB Colony, Adoni, Kurnool District, Pincode - 518301').replace(/,([^,]+),([^,]+)$/, ',<br>$1,$2')}</p>
         <p>GSTIN No - ${companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
       </div>
 
       <div class="quotation-info">
         <div class="bill-to">
-          <p><strong>To:</strong><br>${quotation.customer?.name || 'Customer'}</p>
-          <p>${quotation.customer?.phone || quotation.customer_phone || quotation.customer?.mobile || quotation.customer?.contact?.phone || ''}</p>
-          <p>${quotation.customer?.email || quotation.customer_email || quotation.customer?.contact?.email || ''}</p>
-          <p>${quotation.customer?.address || quotation.customer_address || quotation.customer?.billing_address || quotation.customer?.contact?.address || ''}</p>
-          <p>${quotation.customer?.gst_no || quotation.customer_gst_no || quotation.customer?.gst || quotation.customer?.gstin || quotation.customer?.tax_id || ''}</p>
+          <p><strong>To:</strong></p>
+          <p><strong>${quotation.customer?.name || 'Customer'}</strong></p>
+          ${quotation.customer?.company ? `<p>${quotation.customer.company}</p>` : ''}
+          ${quotation.customer?.email ? `<p>Email: ${quotation.customer.email}</p>` : ''}
+          ${quotation.customer?.phone ? `<p>Contact: ${quotation.customer.phone}</p>` : ''}
+          ${quotation.customer?.gst_no ? `<p>GST No: ${quotation.customer.gst_no}</p>` : ''}
+          ${quotation.customer?.address ? `<p>Address: ${quotation.customer.address}</p>` : ''}
+          ${quotation.customer?.city || quotation.customer?.state || quotation.customer?.pincode ? `<p>${[quotation.customer?.city, quotation.customer?.state, quotation.customer?.pincode].filter(Boolean).join(', ')}</p>` : ''}
         </div>
         <div>
           <p><strong>QUOTATION No:</strong> ${quotation.quotation_number}</p>
@@ -431,36 +436,37 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
         <strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only
       </div>
 
-      <div class="bank-details">
-        <h3>Company's Bank Details</h3>
-        <table class="bank-table">
-          <tr>
-            <td><strong>Holder A/c Name</strong></td>
-            <td>${companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</td>
-          </tr>
-          <tr>
-            <td><strong>BANK NAME</strong></td>
-            <td>${companySettings.bankName || 'HDFC BANK'}</td>
-          </tr>
-          <tr>
-            <td><strong>ACCOUNT No</strong></td>
-            <td>${companySettings.accountNumber || '9998019993333'}</td>
-          </tr>
-          <tr>
-            <td><strong>BRANCH</strong></td>
-            <td>${companySettings.branchAddress || 'ADONI'}</td>
-          </tr>
-          <tr>
-            <td><strong>IFSC CODE</strong></td>
-            <td>${companySettings.routingNumber || 'HDFC0001933'}</td>
-          </tr>
-        </table>
-      </div>
+      <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+        <div class="bank-details" style="width: 55%;">
+          <h3>Company's Bank Details</h3>
+          <table class="bank-table" style="width: 100%;">
+            <tr>
+              <td><strong>Holder A/c Name</strong></td>
+              <td>${companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</td>
+            </tr>
+            <tr>
+              <td><strong>BANK NAME</strong></td>
+              <td>${companySettings.bankName || 'HDFC BANK'}</td>
+            </tr>
+            <tr>
+              <td><strong>ACCOUNT No</strong></td>
+              <td>${companySettings.accountNumber || '9998019993333'}</td>
+            </tr>
+            <tr>
+              <td><strong>BRANCH</strong></td>
+              <td>${companySettings.branchAddress || 'ADONI'}</td>
+            </tr>
+            <tr>
+              <td><strong>IFSC CODE</strong></td>
+              <td>${companySettings.routingNumber || 'HDFC0001933'}</td>
+            </tr>
+          </table>
+        </div>
 
-      <div class="signature">
-        <p>For ${companySettings.name || 'ARTISAN APPARELS'}</p>
-        <br><br><br>
-        <p>Authorised Signatory</p>
+        <div class="signature" style="width: 40%; text-align: center; border: 2px solid #000; padding: 20px; margin-top: 20px;">
+          <p style="margin-bottom: 60px;"><strong>For ${companySettings.name || 'ARTISAN APPARELS'}</strong></p>
+          <p><strong>Authorised Signatory</strong></p>
+        </div>
       </div>
     </body>
     </html>
