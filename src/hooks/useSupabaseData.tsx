@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
+import { useToast } from "./use-toast";
 
 export interface Quotation {
   id: string;
@@ -25,10 +27,15 @@ export interface Customer {
   name: string;
   email?: string;
   phone?: string;
+  company?: string;
   address?: string;
   gst_no?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
   created_at: string;
   updated_at: string;
+  user_id?: string;
 }
 
 export interface Invoice {
@@ -38,7 +45,11 @@ export interface Invoice {
   customer_email?: string;
   customer_phone?: string;
   customer_address?: string;
+  customer_company?: string;
   customer_gst_no?: string;
+  customer_city?: string;
+  customer_state?: string;
+  customer_pincode?: string;
   subtotal: number;
   tax_amount: number;
   tax_rate?: number;
@@ -50,6 +61,7 @@ export interface Invoice {
   notes?: string;
   created_at: string;
   updated_at: string;
+  user_id?: string;
 }
 
 export interface Payment {
@@ -61,27 +73,37 @@ export interface Payment {
   invoice_id?: string;
   notes?: string;
   created_at: string;
+  user_id?: string;
 }
 
 export const useSupabaseData = () => {
+  const { user } = useAuth();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const fetchData = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       // Fetch customers
       const { data: customersData } = await supabase
         .from("customers")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       // Fetch invoices
       const { data: invoicesData } = await supabase
         .from("invoices")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       // Fetch quotations with customer data
@@ -91,12 +113,14 @@ export const useSupabaseData = () => {
           *,
           customer:customers(*)
         `)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       // Fetch payments
       const { data: paymentsData } = await supabase
         .from("payments")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       setCustomers(customersData || []);
@@ -111,6 +135,11 @@ export const useSupabaseData = () => {
       setPayments(paymentsData || []);
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load data. Please refresh the page.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -118,12 +147,21 @@ export const useSupabaseData = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [user]);
 
   const addCustomer = async (customerData: Omit<Customer, "id" | "created_at" | "updated_at">) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add customers.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("customers")
-      .insert([customerData])
+      .insert([{ ...customerData, user_id: user.id }])
       .select()
       .single();
 
@@ -131,14 +169,32 @@ export const useSupabaseData = () => {
       setCustomers(prev => [data, ...prev]);
       return data;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add customer.",
+        variant: "destructive",
+      });
+    }
     return null;
   };
 
   const addInvoice = async (invoiceData: Omit<Invoice, "id" | "invoice_number" | "created_at" | "updated_at">) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create invoices.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     // Generate invoice number
     const { count } = await supabase
       .from("invoices")
-      .select("*", { count: "exact", head: true });
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id);
 
     const invoiceNumber = `INV-${String((count || 0) + 1).padStart(3, '0')}`;
 
@@ -146,7 +202,8 @@ export const useSupabaseData = () => {
       .from("invoices")
       .insert([{ 
         ...invoiceData, 
-        invoice_number: invoiceNumber 
+        invoice_number: invoiceNumber,
+        user_id: user.id
       }])
       .select()
       .single();
@@ -159,14 +216,32 @@ export const useSupabaseData = () => {
       setInvoices(prev => [processedData, ...prev]);
       return processedData;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create invoice.",
+        variant: "destructive",
+      });
+    }
     return null;
   };
 
   const updateInvoice = async (invoiceId: string, invoiceData: Partial<Invoice>) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update invoices.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("invoices")
       .update(invoiceData)
       .eq("id", invoiceId)
+      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -178,27 +253,63 @@ export const useSupabaseData = () => {
       setInvoices(prev => prev.map(i => i.id === invoiceId ? processedData : i));
       return processedData;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update invoice.",
+        variant: "destructive",
+      });
+    }
     return null;
   };
 
   const deleteInvoice = async (invoiceId: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete invoices.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const { error } = await supabase
       .from("invoices")
       .delete()
-      .eq("id", invoiceId);
+      .eq("id", invoiceId)
+      .eq("user_id", user.id);
 
     if (!error) {
       setInvoices(prev => prev.filter(i => i.id !== invoiceId));
       return true;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete invoice.",
+        variant: "destructive",
+      });
+    }
     return false;
   };
 
   const updateCustomer = async (customerId: string, customerData: Partial<Customer>) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update customers.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("customers")
       .update(customerData)
       .eq("id", customerId)
+      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -206,26 +317,61 @@ export const useSupabaseData = () => {
       setCustomers(prev => prev.map(c => c.id === customerId ? data : c));
       return data;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update customer.",
+        variant: "destructive",
+      });
+    }
     return null;
   };
 
   const deleteCustomer = async (customerId: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete customers.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const { error } = await supabase
       .from("customers")
       .delete()
-      .eq("id", customerId);
+      .eq("id", customerId)
+      .eq("user_id", user.id);
 
     if (!error) {
       setCustomers(prev => prev.filter(c => c.id !== customerId));
       return true;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete customer.",
+        variant: "destructive",
+      });
+    }
     return false;
   };
 
   const addPayment = async (paymentData: Omit<Payment, "id" | "created_at">) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to record payments.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("payments")
-      .insert([paymentData])
+      .insert([{ ...paymentData, user_id: user.id }])
       .select()
       .single();
 
@@ -233,14 +379,32 @@ export const useSupabaseData = () => {
       setPayments(prev => [data, ...prev]);
       return data;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to record payment.",
+        variant: "destructive",
+      });
+    }
     return null;
   };
 
   const addQuotation = async (quotationData: Omit<Quotation, "id" | "quotation_number" | "created_at" | "updated_at">) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create quotations.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     // Generate quotation number
     const { count } = await supabase
       .from("quotations")
-      .select("*", { count: "exact", head: true });
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id);
 
     const quotationNumber = `QUO-${String((count || 0) + 1).padStart(3, '0')}`;
 
@@ -249,7 +413,7 @@ export const useSupabaseData = () => {
       .insert([{ 
         ...quotationData, 
         quotation_number: quotationNumber,
-        user_id: (await supabase.auth.getUser()).data.user?.id || null
+        user_id: user.id
       }])
       .select()
       .single();
@@ -262,14 +426,32 @@ export const useSupabaseData = () => {
       setQuotations(prev => [processedData, ...prev]);
       return processedData;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create quotation.",
+        variant: "destructive",
+      });
+    }
     return null;
   };
 
   const updateQuotation = async (quotationId: string, quotationData: Partial<Quotation>) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update quotations.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("quotations")
       .update(quotationData)
       .eq("id", quotationId)
+      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -281,18 +463,44 @@ export const useSupabaseData = () => {
       setQuotations(prev => prev.map(q => q.id === quotationId ? processedData : q));
       return processedData;
     }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update quotation.",
+        variant: "destructive",
+      });
+    }
     return null;
   };
 
   const deleteQuotation = async (quotationId: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete quotations.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const { error } = await supabase
       .from("quotations")
       .delete()
-      .eq("id", quotationId);
+      .eq("id", quotationId)
+      .eq("user_id", user.id);
 
     if (!error) {
       setQuotations(prev => prev.filter(q => q.id !== quotationId));
       return true;
+    }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete quotation.",
+        variant: "destructive",
+      });
     }
     return false;
   };
