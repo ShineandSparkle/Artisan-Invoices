@@ -80,7 +80,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
 
     // Calculate totals
     const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
-    const taxRate = formData.taxType === 'IGST' ? 0.05 : 0.05; // Both options are 5% total
+    const taxRate = 0.18; // IGST 18% or CGST 9% + SGST 9% = 18% total
     const taxAmount = subtotal * taxRate;
     const grandTotal = subtotal + taxAmount;
 
@@ -135,7 +135,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
 
   // Calculate totals for display
   const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
-  const taxRate = formData.taxType === 'IGST' ? 0.05 : 0.05;
+  const taxRate = 0.18; // IGST 18% or CGST 9% + SGST 9% = 18% total
   const taxAmount = subtotal * taxRate;
   const grandTotal = subtotal + taxAmount;
 
