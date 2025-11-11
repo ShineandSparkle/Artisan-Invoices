@@ -14,7 +14,313 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      customers: {
+        Row: {
+          address: string | null
+          city: string | null
+          company: string | null
+          created_at: string
+          email: string | null
+          gst_no: string | null
+          id: string
+          name: string
+          phone: string | null
+          pincode: string | null
+          state: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          gst_no?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          gst_no?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      invoices: {
+        Row: {
+          created_at: string
+          customer_address: string | null
+          customer_city: string | null
+          customer_company: string | null
+          customer_email: string | null
+          customer_gst_no: string | null
+          customer_name: string
+          customer_phone: string | null
+          customer_pincode: string | null
+          customer_state: string | null
+          due_date: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string
+          items: Json
+          notes: string | null
+          paid_date: string | null
+          status: string
+          subtotal: number
+          tax_amount: number
+          tax_rate: number | null
+          total_amount: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_company?: string | null
+          customer_email?: string | null
+          customer_gst_no?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          customer_pincode?: string | null
+          customer_state?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_date: string
+          invoice_number: string
+          items?: Json
+          notes?: string | null
+          paid_date?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string | null
+          customer_city?: string | null
+          customer_company?: string | null
+          customer_email?: string | null
+          customer_gst_no?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          customer_pincode?: string | null
+          customer_state?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          items?: Json
+          notes?: string | null
+          paid_date?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_name: string
+          id: string
+          invoice_id: string | null
+          notes: string | null
+          payment_date: string
+          payment_method: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_name: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          payment_date: string
+          payment_method: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_name?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotations: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_id: string | null
+          date: string
+          id: string
+          items: Json
+          notes: string | null
+          quotation_number: string
+          status: string
+          subtotal: number
+          tax_amount: number
+          tax_type: string | null
+          updated_at: string
+          user_id: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          customer_id?: string | null
+          date: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          quotation_number: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_type?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_id?: string | null
+          date?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          quotation_number?: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_type?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          created_at: string
+          id: string
+          setting_data: Json
+          setting_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setting_data?: Json
+          setting_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setting_data?: Json
+          setting_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      stock_register: {
+        Row: {
+          closing_stock: number
+          created_at: string
+          id: string
+          month: number
+          opening_stock: number
+          product_name: string
+          production: number
+          sales: number
+          size: string
+          updated_at: string
+          user_id: string | null
+          year: number
+        }
+        Insert: {
+          closing_stock?: number
+          created_at?: string
+          id?: string
+          month: number
+          opening_stock?: number
+          product_name: string
+          production?: number
+          sales?: number
+          size: string
+          updated_at?: string
+          user_id?: string | null
+          year: number
+        }
+        Update: {
+          closing_stock?: number
+          created_at?: string
+          id?: string
+          month?: number
+          opening_stock?: number
+          product_name?: string
+          production?: number
+          sales?: number
+          size?: string
+          updated_at?: string
+          user_id?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
