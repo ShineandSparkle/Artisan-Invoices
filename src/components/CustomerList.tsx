@@ -41,7 +41,7 @@ interface Customer {
   phone?: string;
   address?: string;
   company?: string;
-  gst_number?: string;
+  gst_no?: string;
   city?: string;
   state?: string;
   country?: string;
@@ -177,10 +177,10 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
                               {customer.company}
                             </div>
                           )}
-                          {customer.gst_number && (
+                          {customer.gst_no && (
                             <div className="flex items-center text-sm text-muted-foreground">
                               <Hash className="mr-1 h-3 w-3" />
-                              {customer.gst_number}
+                              {customer.gst_no}
                             </div>
                           )}
                         </div>
@@ -266,7 +266,7 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
                       <span className="font-medium">Company:</span> {selectedCustomer.company || "N/A"}
                     </div>
                     <div>
-                      <span className="font-medium">GST Number:</span> {selectedCustomer.gst_number || "N/A"}
+                      <span className="font-medium">GST Number:</span> {selectedCustomer.gst_no || "N/A"}
                     </div>
                   </div>
                 </div>

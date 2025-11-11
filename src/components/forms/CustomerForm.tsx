@@ -20,7 +20,7 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
     phone: "",
     company: "",
     address: "",
-    gst_number: "",
+    gst_no: "",
     city: "",
     state: "",
     pincode: ""
@@ -36,7 +36,7 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
         phone: initialData.phone || "",
         company: initialData.company || "",
         address: initialData.address || "",
-        gst_number: initialData.gst_number || "",
+        gst_no: initialData.gst_no || "",
         city: initialData.city || "",
         state: initialData.state || "",
         pincode: initialData.pincode || ""
@@ -132,11 +132,11 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
             </div>
 
             <div>
-              <Label htmlFor="gst_number">GST Number</Label>
+              <Label htmlFor="gst_no">GST Number</Label>
               <Input
-                id="gst_number"
-                value={formData.gst_number}
-                onChange={(e) => handleChange("gst_number", e.target.value)}
+                id="gst_no"
+                value={formData.gst_no}
+                onChange={(e) => handleChange("gst_no", e.target.value)}
                 placeholder="Enter GST number"
               />
             </div>
