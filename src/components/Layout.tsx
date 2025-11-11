@@ -9,8 +9,10 @@ import {
   Menu,
   X,
   Package,
+  LogOut,
 } from "lucide-react";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -23,6 +25,7 @@ const HEADER_HEIGHT = 72; // Increased for navigation
 
 const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { signOut } = useAuth();
 
   const navigation = [
     { name: "Dashboard", icon: BarChart3, key: "dashboard" },
@@ -32,6 +35,10 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
     { name: "Stock Register", icon: Package, key: "stock-register" },
     { name: "Settings", icon: Settings, key: "settings" },
   ];
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -60,8 +67,17 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
               ))}
             </nav>
 
-            {/* Right side - Mobile menu button only */}
-            <div className="flex items-center">
+            {/* Right side - Logout and Mobile menu button */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="hidden md:flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
               {/* Mobile menu button */}
               <Button
                 variant="ghost"
@@ -93,6 +109,14 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
                   {item.name}
                 </Button>
               ))}
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-3 h-4 w-4" />
+                Logout
+              </Button>
             </div>
           </div>
         )}
