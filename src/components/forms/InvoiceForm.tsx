@@ -20,7 +20,6 @@ interface InvoiceFormProps {
 interface InvoiceItem {
   description: string;
   shirt_size: string;
-  hsn_code: string;
   quantity: number;
   rate: number;
   amount: number;

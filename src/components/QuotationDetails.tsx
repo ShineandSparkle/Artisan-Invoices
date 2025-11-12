@@ -122,19 +122,17 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
             <table className="w-full">
               <thead className="bg-muted">
                 <tr>
-                  <th className="text-left p-3 border">Description of Goods</th>
-                  <th className="text-center p-3 border">HSN CODE</th>
-                  <th className="text-center p-3 border">QTY</th>
-                  <th className="text-center p-3 border">Units</th>
-                  <th className="text-right p-3 border">RATE (Incl of Tax)</th>
-                  <th className="text-right p-3 border">Amount</th>
+                  <th className="text-left p-3 border" style={{ width: '52%' }}>Description of Goods</th>
+                  <th className="text-center p-3 border" style={{ width: '12%' }}>QTY</th>
+                  <th className="text-center p-3 border" style={{ width: '12%' }}>Units</th>
+                  <th className="text-right p-3 border" style={{ width: '12%' }}>RATE (Incl of Tax)</th>
+                  <th className="text-right p-3 border" style={{ width: '12%' }}>Amount</th>
                 </tr>
               </thead>
               <tbody>
                 {quotation.items?.map((item: any, index: number) => (
                   <tr key={index}>
-                    <td className="p-3 border">{item.description}</td>
-                    <td className="text-center p-3 border">{item.hsn_code || 'Shirts'}</td>
+                    <td className="p-3 border">{item.description}{item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
                     <td className="text-center p-3 border">{item.quantity}</td>
                     <td className="text-center p-3 border">{item.unit || 'Pcs'}</td>
                     <td className="text-right p-3 border">₹{item.rate?.toFixed(2)}</td>
@@ -150,15 +148,15 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
             <table className="w-full">
               <tbody>
                 <tr>
-                  <td colSpan={5} className="text-right p-3 border font-semibold">Total:</td>
+                  <td colSpan={4} className="text-right p-3 border font-semibold">Total:</td>
                   <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
                 </tr>
                 <tr>
-                  <td colSpan={5} className="text-right p-3 border">Discount:</td>
+                  <td colSpan={4} className="text-right p-3 border">Discount:</td>
                   <td className="text-right p-3 border">₹0.00</td>
                 </tr>
                 <tr>
-                  <td colSpan={5} className="text-right p-3 border font-semibold">Taxable Value:</td>
+                  <td colSpan={4} className="text-right p-3 border font-semibold">Taxable Value:</td>
                   <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
                 </tr>
                 {isIGST ? (
