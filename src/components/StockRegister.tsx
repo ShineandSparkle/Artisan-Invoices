@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Trash2, Edit, Eye, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSupabaseData } from "@/hooks/useSupabaseData";
 
 interface ProductStockData {
   product: string;
@@ -59,33 +60,37 @@ const StockRegister = () => {
   const [viewingProduct, setViewingProduct] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [stockEntries, setStockEntries] = useState<StockEntry[]>([]);
   
   const { toast } = useToast();
+  const { fetchStockRegister, addStockEntry, updateStockEntry, deleteStockEntry } = useSupabaseData();
 
   useEffect(() => {
     loadStockData();
   }, [selectedMonth, selectedYear]);
 
-  const getStorageKey = () => `stock-register-${selectedYear}-${selectedMonth}`;
-
-  const loadStockData = () => {
-    const storageKey = getStorageKey();
-    const savedData = localStorage.getItem(storageKey);
+  const loadStockData = async () => {
+    const entries = await fetchStockRegister(selectedMonth, selectedYear);
+    setStockEntries(entries);
     
-    let stockEntries: StockEntry[] = [];
-    if (savedData) {
-      try {
-        stockEntries = JSON.parse(savedData);
-      } catch (error) {
-        console.error("Error parsing stock data:", error);
-      }
+    // Get previous month's closing stock for opening stock
+    let prevMonth = selectedMonth - 1;
+    let prevYear = selectedYear;
+    if (prevMonth === 0) {
+      prevMonth = 12;
+      prevYear = prevYear - 1;
     }
+    const prevEntries = await fetchStockRegister(prevMonth, prevYear);
     
     const productData: ProductStockData[] = PRODUCTS.map(productName => {
       const sizes: { [size: string]: any } = {};
       
       SIZES.forEach(size => {
-        const existingEntry = stockEntries.find(
+        const existingEntry = entries.find(
+          entry => entry.product_name === productName && entry.size === size
+        );
+        
+        const prevEntry = prevEntries.find(
           entry => entry.product_name === productName && entry.size === size
         );
         
@@ -97,11 +102,12 @@ const StockRegister = () => {
             closingStock: existingEntry.closing_stock
           };
         } else {
+          // Use previous month's closing stock as opening stock
           sizes[size] = {
-            openingStock: 0,
+            openingStock: prevEntry?.closing_stock || 0,
             production: 0,
             sales: 0,
-            closingStock: 0
+            closingStock: prevEntry?.closing_stock || 0
           };
         }
       });
@@ -110,11 +116,6 @@ const StockRegister = () => {
     });
     
     setProducts(productData);
-  };
-
-  const saveStockData = (stockEntries: StockEntry[]) => {
-    const storageKey = getStorageKey();
-    localStorage.setItem(storageKey, JSON.stringify(stockEntries));
   };
 
   const calculateClosingStock = (openingStock: number, production: number, sales: number): number => {
@@ -131,50 +132,40 @@ const StockRegister = () => {
     setIsViewDialogOpen(true);
   };
 
-  const handleDelete = (productName: string) => {
-    const storageKey = getStorageKey();
-    const savedData = localStorage.getItem(storageKey);
+  const handleDelete = async (productName: string) => {
+    const entriesToDelete = stockEntries.filter(
+      entry => entry.product_name === productName
+    );
     
-    if (savedData) {
-      try {
-        const stockEntries: StockEntry[] = JSON.parse(savedData);
-        const filteredEntries = stockEntries.filter(
-          entry => entry.product_name !== productName
-        );
-        saveStockData(filteredEntries);
-        loadStockData();
-        
-        toast({
-          title: "Product deleted",
-          description: "Product stock entries have been removed.",
-        });
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to delete product stock entries.",
-          variant: "destructive",
-        });
+    try {
+      for (const entry of entriesToDelete) {
+        await deleteStockEntry(entry.id);
       }
+      
+      await loadStockData();
+      
+      toast({
+        title: "Product deleted",
+        description: "Product stock entries have been removed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete product stock entries.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingProduct) return;
 
     const productData = products.find(p => p.product === editingProduct);
     if (!productData) return;
 
     try {
-      const storageKey = getStorageKey();
-      const savedData = localStorage.getItem(storageKey);
-      let stockEntries: StockEntry[] = [];
-      
-      if (savedData) {
-        stockEntries = JSON.parse(savedData);
-      }
-
       // Update/create entries for each size
-      SIZES.forEach(size => {
+      for (const size of SIZES) {
         const sizeData = productData.sizes[size];
         const closingStock = calculateClosingStock(
           sizeData.openingStock,
@@ -182,15 +173,14 @@ const StockRegister = () => {
           sizeData.sales
         );
 
-        const existingIndex = stockEntries.findIndex(
+        const existingEntry = stockEntries.find(
           entry => entry.product_name === editingProduct && 
                   entry.size === size &&
                   entry.month === selectedMonth &&
                   entry.year === selectedYear
         );
 
-        const stockEntry: StockEntry = {
-          id: existingIndex >= 0 ? stockEntries[existingIndex].id : `${Date.now()}-${size}`,
+        const stockData = {
           product_name: editingProduct,
           size: size,
           month: selectedMonth,
@@ -201,15 +191,14 @@ const StockRegister = () => {
           closing_stock: closingStock
         };
 
-        if (existingIndex >= 0) {
-          stockEntries[existingIndex] = stockEntry;
+        if (existingEntry) {
+          await updateStockEntry(existingEntry.id, stockData);
         } else {
-          stockEntries.push(stockEntry);
+          await addStockEntry(stockData);
         }
-      });
+      }
 
-      saveStockData(stockEntries);
-      loadStockData();
+      await loadStockData();
 
       setIsEditDialogOpen(false);
       setEditingProduct(null);
