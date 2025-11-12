@@ -20,13 +20,22 @@ const numberToWords = (num: number): string => {
   return convert(Math.floor(num));
 };
 
+const getTaxRate = (taxType: string) => {
+  if (taxType?.includes('18')) return 18;
+  if (taxType?.includes('12')) return 12;
+  if (taxType?.includes('5')) return 5;
+  return 18;
+};
+
 export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanySettings): string => {
   const subtotal = invoice.subtotal || 0;
   const taxAmount = invoice.tax_amount || 0;
   const totalAmount = invoice.total_amount || invoice.amount || 0;
   const cgstAmount = taxAmount / 2;
   const sgstAmount = taxAmount / 2;
-  const taxRate = invoice.tax_type === 'IGST' ? 18 : 9; // 18% IGST or 9% CGST + 9% SGST
+  const fullTaxRate = getTaxRate(invoice.tax_type || 'IGST_18');
+  const halfTaxRate = fullTaxRate / 2;
+  const isIGST = invoice.tax_type?.startsWith('IGST');
   
   const amountInWords = numberToWords(Math.floor(totalAmount));
 
@@ -179,18 +188,18 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
           <td colspan="5" class="text-right bold">Taxable Value:</td>
           <td class="text-right bold">${subtotal.toFixed(2)}</td>
         </tr>
-        ${invoice.tax_type === 'IGST' ? `
+        ${isIGST ? `
           <tr>
-            <td colspan="5" class="text-right">ADD IGST ${taxRate}%:</td>
+            <td colspan="5" class="text-right">ADD IGST ${fullTaxRate}%:</td>
             <td class="text-right">${taxAmount.toFixed(2)}</td>
           </tr>
         ` : `
           <tr>
-            <td colspan="5" class="text-right">ADD CGST ${taxRate}%:</td>
+            <td colspan="5" class="text-right">ADD CGST ${halfTaxRate}%:</td>
             <td class="text-right">${cgstAmount.toFixed(2)}</td>
           </tr>
           <tr>
-            <td colspan="5" class="text-right">ADD SGST ${taxRate}%:</td>
+            <td colspan="5" class="text-right">ADD SGST ${halfTaxRate}%:</td>
             <td class="text-right">${sgstAmount.toFixed(2)}</td>
           </tr>
         `}
@@ -247,7 +256,9 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
   const totalAmount = quotation.amount || 0;
   const cgstAmount = taxAmount / 2;
   const sgstAmount = taxAmount / 2;
-  const taxRate = quotation.tax_type === 'IGST' ? 18 : 9;
+  const fullTaxRate = getTaxRate(quotation.tax_type || 'IGST_18');
+  const halfTaxRate = fullTaxRate / 2;
+  const isIGST = quotation.tax_type?.startsWith('IGST');
   
   const amountInWords = numberToWords(Math.floor(totalAmount));
 
@@ -415,18 +426,18 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
           <td colspan="5" class="text-right bold">Taxable Value:</td>
           <td class="text-right bold">${subtotal.toFixed(2)}</td>
         </tr>
-        ${quotation.tax_type === 'IGST' ? `
+        ${isIGST ? `
           <tr>
-            <td colspan="5" class="text-right">ADD IGST ${taxRate}%:</td>
+            <td colspan="5" class="text-right">ADD IGST ${fullTaxRate}%:</td>
             <td class="text-right">${taxAmount.toFixed(2)}</td>
           </tr>
         ` : `
           <tr>
-            <td colspan="5" class="text-right">ADD CGST ${taxRate}%:</td>
+            <td colspan="5" class="text-right">ADD CGST ${halfTaxRate}%:</td>
             <td class="text-right">${cgstAmount.toFixed(2)}</td>
           </tr>
           <tr>
-            <td colspan="5" class="text-right">ADD SGST ${taxRate}%:</td>
+            <td colspan="5" class="text-right">ADD SGST ${halfTaxRate}%:</td>
             <td class="text-right">${sgstAmount.toFixed(2)}</td>
           </tr>
         `}
