@@ -126,7 +126,7 @@ const QuotationList = ({
                 <TableRow>
                   <TableHead>Quotation ID</TableHead>
                   <TableHead>Customer</TableHead>
-                  <TableHead>Shirt Sizes</TableHead>
+                  <TableHead>Size</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>

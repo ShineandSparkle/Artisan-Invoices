@@ -131,7 +131,7 @@ const InvoiceList = ({
                 <TableRow>
                   <TableHead>Invoice ID</TableHead>
                   <TableHead>Customer</TableHead>
-                  <TableHead>Shirt Sizes</TableHead>
+                  <TableHead>Size</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Issue Date</TableHead>

@@ -110,7 +110,7 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
             <table className="w-full">
               <thead className="bg-muted">
                 <tr>
-                  <th className="text-left p-3 border" style={{ width: '52%' }}>Description of Goods</th>
+                  <th className="text-left p-3 border" style={{ width: '52%' }}>Particulars</th>
                   <th className="text-center p-3 border" style={{ width: '12%' }}>QTY</th>
                   <th className="text-center p-3 border" style={{ width: '12%' }}>Units</th>
                   <th className="text-right p-3 border" style={{ width: '12%' }}>RATE (Incl of Tax)</th>
