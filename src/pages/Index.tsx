@@ -382,6 +382,11 @@ const Index = () => {
                 return;
               }
 
+              // Calculate due date (30 days from invoice date)
+              const invoiceDate = new Date();
+              const dueDate = new Date(invoiceDate);
+              dueDate.setDate(dueDate.getDate() + 30);
+
               const invoiceData = {
                 customer_name: customer.name,
                 customer_email: customer.email || "",
@@ -395,8 +400,9 @@ const Index = () => {
                 subtotal: quotation.subtotal,
                 tax_amount: quotation.tax_amount,
                 total_amount: quotation.amount,
-                invoice_date: new Date().toISOString().split('T')[0],
-                status: "Unpaid",
+                invoice_date: invoiceDate.toISOString().split('T')[0],
+                due_date: dueDate.toISOString().split('T')[0],
+                status: "unpaid",
                 items: quotation.items,
                 notes: quotation.notes || "",
                 tax_type: quotation.tax_type

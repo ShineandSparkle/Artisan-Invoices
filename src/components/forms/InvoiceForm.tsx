@@ -24,6 +24,7 @@ interface InvoiceItem {
   quantity: number;
   rate: number;
   amount: number;
+  customDescription?: string;
 }
 
 const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'create' }: InvoiceFormProps) => {
@@ -73,9 +74,22 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
         taxType: initialData.tax_type || "IGST_18",
         status: initialData.status?.toLowerCase() || "draft"
       });
-      setItems(initialData.items || []);
+      
+      // Process items to handle products not in dropdown
+      const processedItems = (initialData.items || []).map((item: InvoiceItem) => {
+        const isInProductList = products.includes(item.description);
+        if (!isInProductList && item.description) {
+          return {
+            ...item,
+            description: "__custom__",
+            customDescription: item.description
+          };
+        }
+        return item;
+      });
+      setItems(processedItems);
     }
-  }, [initialData, mode, customers]);
+  }, [initialData, mode, customers, products]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +103,15 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       return;
     }
 
-    const validItems = items.filter(item => 
+    // Process items to use custom description if applicable
+    const processedItems = items.map(item => {
+      if (item.description === "__custom__" && item.customDescription) {
+        return { ...item, description: item.customDescription, customDescription: undefined };
+      }
+      return item;
+    });
+    
+    const validItems = processedItems.filter(item => 
       (item.description.trim() || item.shirt_size.trim()) && item.quantity > 0 && item.rate > 0
     );
     
@@ -130,7 +152,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       due_date: formData.dueDate,
       notes: formData.notes,
       tax_type: formData.taxType,
-      items: items,
+      items: validItems,
       total_amount: grandTotal,
       subtotal: subtotal,
       tax_amount: taxAmount,
@@ -369,8 +391,12 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                       {item.description === "__custom__" && (
                         <Input
                           className="mt-2"
-                          value=""
-                          onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                          value={item.customDescription || ""}
+                          onChange={(e) => {
+                            const newItems = [...items];
+                            newItems[index] = { ...newItems[index], customDescription: e.target.value };
+                            setItems(newItems);
+                          }}
                           placeholder="Enter custom description"
                         />
                       )}
@@ -397,8 +423,12 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                       {item.description === "__custom__" && (
                         <Input
                           className="mt-2"
-                          value=""
-                          onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                          value={item.customDescription || ""}
+                          onChange={(e) => {
+                            const newItems = [...items];
+                            newItems[index] = { ...newItems[index], customDescription: e.target.value };
+                            setItems(newItems);
+                          }}
                           placeholder="Enter custom description"
                         />
                       )}
