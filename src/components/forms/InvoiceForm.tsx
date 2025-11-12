@@ -44,9 +44,12 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
 
   useEffect(() => {
     if (initialData && mode === 'edit') {
+      // Find customer by name since invoices store customer data denormalized
+      const matchingCustomer = customers.find(c => c.name === initialData.customer_name);
+      
       setFormData({
-        customerId: initialData.customer_id || "",
-        date: initialData.date || new Date().toISOString().split('T')[0],
+        customerId: matchingCustomer?.id || "",
+        date: initialData.invoice_date || new Date().toISOString().split('T')[0],
         dueDate: initialData.due_date || "",
         notes: initialData.notes || "",
         taxType: initialData.tax_type || "IGST_18",
@@ -54,7 +57,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       });
       setItems(initialData.items || []);
     }
-  }, [initialData, mode]);
+  }, [initialData, mode, customers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,14 +96,24 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
     const taxAmount = subtotal * taxRate;
     const grandTotal = subtotal + taxAmount;
 
+    const selectedCustomer = customers.find(c => c.id === formData.customerId);
+    
     const invoiceData = {
-      customer_id: formData.customerId,
-      date: formData.date,
+      customer_name: selectedCustomer?.name || "",
+      customer_email: selectedCustomer?.email || "",
+      customer_phone: selectedCustomer?.phone || "",
+      customer_address: selectedCustomer?.address || "",
+      customer_company: selectedCustomer?.company || "",
+      customer_gst_no: selectedCustomer?.gst_no || "",
+      customer_city: selectedCustomer?.city || "",
+      customer_state: selectedCustomer?.state || "",
+      customer_pincode: selectedCustomer?.pincode || "",
+      invoice_date: formData.date,
       due_date: formData.dueDate,
       notes: formData.notes,
       tax_type: formData.taxType,
       items: items,
-      amount: grandTotal,
+      total_amount: grandTotal,
       subtotal: subtotal,
       tax_amount: taxAmount,
       status: formData.status
