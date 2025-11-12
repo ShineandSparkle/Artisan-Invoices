@@ -34,7 +34,9 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
     validUntil: "",
     notes: "",
     taxType: "IGST_18",
-    status: "pending"
+    status: "pending",
+    complimentary: false,
+    taxMode: "exclusive"
   });
 
   const [items, setItems] = useState<QuotationItem[]>([
@@ -69,7 +71,9 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
         validUntil: initialData.valid_until || "",
         notes: initialData.notes || "",
         taxType: initialData.tax_type || "IGST_18",
-        status: initialData.status || "save"
+        status: initialData.status || "pending",
+        complimentary: false,
+        taxMode: "exclusive"
       });
       
       // Process items to handle products not in dropdown
@@ -122,7 +126,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
     });
 
     // Calculate totals using processed items
-    const subtotal = processedItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+    let subtotal = processedItems.reduce((sum, item) => sum + (item.amount || 0), 0);
     const getTaxRate = (taxType: string) => {
       if (taxType.includes('18')) return 0.18;
       if (taxType.includes('12')) return 0.12;
@@ -130,8 +134,24 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
       return 0.18;
     };
     const taxRate = getTaxRate(formData.taxType);
-    const taxAmount = subtotal * taxRate;
-    const grandTotal = subtotal + taxAmount;
+    let taxAmount = 0;
+    let grandTotal = 0;
+
+    if (formData.complimentary) {
+      // If complimentary, all amounts are zero
+      subtotal = 0;
+      taxAmount = 0;
+      grandTotal = 0;
+    } else if (formData.taxMode === 'inclusive') {
+      // Inclusive: grandTotal includes tax
+      grandTotal = subtotal; // Current subtotal is actually the grand total
+      subtotal = grandTotal / (1 + taxRate);
+      taxAmount = grandTotal - subtotal;
+    } else {
+      // Exclusive: add tax to subtotal
+      taxAmount = subtotal * taxRate;
+      grandTotal = subtotal + taxAmount;
+    }
 
     const quotationData = {
       customer_id: formData.customerId,
@@ -193,7 +213,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
   };
 
   // Calculate totals for display
-  const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const itemsTotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
   const getTaxRate = (taxType: string) => {
     if (taxType.includes('18')) return 0.18;
     if (taxType.includes('12')) return 0.12;
@@ -201,8 +221,26 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
     return 0.18;
   };
   const taxRate = getTaxRate(formData.taxType);
-  const taxAmount = subtotal * taxRate;
-  const grandTotal = subtotal + taxAmount;
+  
+  let subtotal = itemsTotal;
+  let taxAmount = 0;
+  let grandTotal = 0;
+
+  if (formData.complimentary) {
+    // If complimentary, all amounts are zero
+    subtotal = 0;
+    taxAmount = 0;
+    grandTotal = 0;
+  } else if (formData.taxMode === 'inclusive') {
+    // Inclusive: grandTotal includes tax
+    grandTotal = itemsTotal;
+    subtotal = grandTotal / (1 + taxRate);
+    taxAmount = grandTotal - subtotal;
+  } else {
+    // Exclusive: add tax to subtotal
+    taxAmount = subtotal * taxRate;
+    grandTotal = subtotal + taxAmount;
+  }
 
   return (
     <Card className="max-w-4xl mx-auto">
@@ -233,6 +271,48 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
             </div>
 
             <div>
+              <Label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.complimentary}
+                  onChange={(e) => handleChange('complimentary', e.target.checked)}
+                  className="h-4 w-4"
+                />
+                Complimentary
+              </Label>
+            </div>
+
+            <div>
+              <Label>Tax Mode</Label>
+              <div className="mt-2 flex gap-4">
+                <Label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="taxMode"
+                    value="exclusive"
+                    checked={formData.taxMode === 'exclusive'}
+                    onChange={(e) => handleChange('taxMode', e.target.value)}
+                    className="mr-2"
+                    disabled={formData.complimentary}
+                  />
+                  Exclusive Tax
+                </Label>
+                <Label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="taxMode"
+                    value="inclusive"
+                    checked={formData.taxMode === 'inclusive'}
+                    onChange={(e) => handleChange('taxMode', e.target.value)}
+                    className="mr-2"
+                    disabled={formData.complimentary}
+                  />
+                  Inclusive Tax
+                </Label>
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
               <Label>Tax Type</Label>
               <div className="mt-2 grid grid-cols-2 gap-4">
                 <Label className="flex items-center">
