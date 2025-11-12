@@ -80,7 +80,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
   const halfTaxRate = fullTaxRate / 2;
   const isIGST = invoice.tax_type?.startsWith('IGST');
   const amountInWords = numberToWords(Math.floor(totalAmount));
-  const logoUrl = `${window.location.origin}/Logo - IAM Ratan.png`;
+  const logoUrl = companySettings.logo || `${window.location.origin}/Logo - IAM Ratan.png`;
 
   return `
   <!DOCTYPE html>
@@ -184,7 +184,7 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
   const halfTaxRate = fullTaxRate / 2;
   const isIGST = quotation.tax_type?.startsWith('IGST');
   const amountInWords = numberToWords(Math.floor(totalAmount));
-  const logoUrl = `${window.location.origin}/Logo - IAM Ratan.png`;
+  const logoUrl = companySettings.logo || `${window.location.origin}/Logo - IAM Ratan.png`;
 
   return `
   <!DOCTYPE html>
