@@ -31,7 +31,10 @@ import {
   Receipt,
   MapPin,
   Building,
-  Hash
+  Hash,
+  Printer,
+  Upload,
+  Download
 } from "lucide-react";
 
 interface Customer {
@@ -46,6 +49,7 @@ interface Customer {
   state?: string;
   country?: string;
   pincode?: string;
+  shirt_size?: string;
   totalQuotations?: number;
   totalInvoices?: number;
   totalAmount?: number;
@@ -64,6 +68,112 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showViewDialog, setShowViewDialog] = useState(false);
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>All Customers</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; margin-bottom: 30px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            @media print {
+              button { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>All Customers</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Size</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Company</th>
+                <th>GST No</th>
+                <th>City</th>
+                <th>State</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${customers.map(customer => `
+                <tr>
+                  <td>${customer.name}</td>
+                  <td>${customer.shirt_size || '-'}</td>
+                  <td>${customer.email || '-'}</td>
+                  <td>${customer.phone || '-'}</td>
+                  <td>${customer.company || '-'}</td>
+                  <td>${customer.gst_no || '-'}</td>
+                  <td>${customer.city || '-'}</td>
+                  <td>${customer.state || '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const handleExport = () => {
+    const csvContent = [
+      ['Customer Name', 'Size', 'Email', 'Phone', 'Company', 'GST No', 'Address', 'City', 'State', 'Pincode'],
+      ...customers.map(c => [
+        c.name,
+        c.shirt_size || '',
+        c.email || '',
+        c.phone || '',
+        c.company || '',
+        c.gst_no || '',
+        c.address || '',
+        c.city || '',
+        c.state || '',
+        c.pincode || ''
+      ])
+    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `customers-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const text = event.target?.result as string;
+          console.log('CSV content:', text);
+          // TODO: Implement CSV parsing and customer creation
+          alert('Import functionality will be implemented soon');
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  };
 
   const displayCustomers = customers.map(c => ({
     ...c,
@@ -117,10 +227,24 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
             className="pl-10"
           />
         </div>
-        <Button onClick={onCreateNew}>
-          <Users className="mr-2 h-4 w-4" />
-          New Customer
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="mr-2 h-4 w-4" />
+            Print
+          </Button>
+          <Button variant="outline" onClick={handleImport}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import
+          </Button>
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+          <Button onClick={onCreateNew}>
+            <Users className="mr-2 h-4 w-4" />
+            New Customer
+          </Button>
+        </div>
       </div>
 
       {/* Customers Table */}
@@ -134,10 +258,10 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
               <TableHeader>
                 <TableRow>
                   <TableHead>Customer</TableHead>
+                  <TableHead>Size</TableHead>
                   <TableHead>Contact</TableHead>
                   <TableHead>Company/GST</TableHead>
                   <TableHead>Location</TableHead>
-                  <TableHead>Type</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -152,10 +276,10 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
                   filteredCustomers.map((customer) => (
                     <TableRow key={customer.id} className="hover:bg-muted/50">
                       <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium">{customer.name}</div>
-                          <div className="text-sm text-muted-foreground">{customer.id.slice(0, 8)}...</div>
-                        </div>
+                        <div className="font-medium">{customer.name}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">{customer.shirt_size || '-'}</div>
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
@@ -200,7 +324,6 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>{getTypeBadge(customer.type)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
