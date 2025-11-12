@@ -27,10 +27,10 @@ const getTaxRate = (taxType: string) => {
   return 18;
 };
 
-const generateCommonHeader = (title: string, companySettings: CompanySettings) => `
+const generateCommonHeader = (title: string, companySettings: CompanySettings, logoUrl: string) => `
   <div class="header">
     <div class="header-top">
-      <img src="/Logo - IAM Ratan.png" alt="Company Logo" class="logo" />
+      <img src="${logoUrl}" alt="Company Logo" class="logo" />
       <div class="title-block">
         <h1>${title}</h1>
         <h2>${companySettings.name || 'Artisan Apparels'}</h2>
@@ -80,6 +80,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
   const halfTaxRate = fullTaxRate / 2;
   const isIGST = invoice.tax_type?.startsWith('IGST');
   const amountInWords = numberToWords(Math.floor(totalAmount));
+  const logoUrl = `${window.location.origin}/Logo - IAM Ratan.png`;
 
   return `
   <!DOCTYPE html>
@@ -89,7 +90,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
     ${generateStyles()}
   </head>
   <body>
-    ${generateCommonHeader('TAX INVOICE', companySettings)}
+    ${generateCommonHeader('TAX INVOICE', companySettings, logoUrl)}
 
     <div class="invoice-info">
       <div class="bill-to">
@@ -183,6 +184,7 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
   const halfTaxRate = fullTaxRate / 2;
   const isIGST = quotation.tax_type?.startsWith('IGST');
   const amountInWords = numberToWords(Math.floor(totalAmount));
+  const logoUrl = `${window.location.origin}/Logo - IAM Ratan.png`;
 
   return `
   <!DOCTYPE html>
@@ -192,7 +194,7 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
     ${generateStyles()}
   </head>
   <body>
-    ${generateCommonHeader('QUOTATION', companySettings)}
+    ${generateCommonHeader('QUOTATION', companySettings, logoUrl)}
 
     <div class="quotation-info">
       <div class="bill-to">
