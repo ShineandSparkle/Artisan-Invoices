@@ -153,8 +153,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
       <table>
         <thead>
           <tr>
-            <th style="width: 40%;">Description of Goods</th>
-            <th class="text-center" style="width: 12%;">HSN CODE</th>
+            <th style="width: 52%;">Description of Goods</th>
             <th class="text-center" style="width: 12%;">QTY</th>
             <th class="text-center" style="width: 12%;">Units</th>
             <th class="text-right" style="width: 12%;">RATE (Incl of Tax)</th>
@@ -165,7 +164,6 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
           ${(invoice.items || []).map((item: any) => `
             <tr>
               <td>${item.description || ''}${item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
-              <td class="text-center">${item.hsn_code || 'Shirts'}</td>
               <td class="text-center">${item.quantity || 0}</td>
               <td class="text-center">${item.unit || 'Pcs'}</td>
               <td class="text-right">${(item.rate || 0).toFixed(2)}</td>
@@ -177,34 +175,34 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
 
       <table class="totals-table">
         <tr>
-          <td colspan="5" class="text-right bold">Total:</td>
+          <td colspan="4" class="text-right bold">Total:</td>
           <td class="text-right bold">${subtotal.toFixed(2)}</td>
         </tr>
         <tr>
-          <td colspan="5" class="text-right">Discount:</td>
+          <td colspan="4" class="text-right">Discount:</td>
           <td class="text-right">0.00</td>
         </tr>
         <tr>
-          <td colspan="5" class="text-right bold">Taxable Value:</td>
+          <td colspan="4" class="text-right bold">Taxable Value:</td>
           <td class="text-right bold">${subtotal.toFixed(2)}</td>
         </tr>
         ${isIGST ? `
           <tr>
-            <td colspan="5" class="text-right">ADD IGST ${fullTaxRate}%:</td>
+            <td colspan="4" class="text-right">ADD IGST ${fullTaxRate}%:</td>
             <td class="text-right">${taxAmount.toFixed(2)}</td>
           </tr>
         ` : `
           <tr>
-            <td colspan="5" class="text-right">ADD CGST ${halfTaxRate}%:</td>
+            <td colspan="4" class="text-right">ADD CGST ${halfTaxRate}%:</td>
             <td class="text-right">${cgstAmount.toFixed(2)}</td>
           </tr>
           <tr>
-            <td colspan="5" class="text-right">ADD SGST ${halfTaxRate}%:</td>
+            <td colspan="4" class="text-right">ADD SGST ${halfTaxRate}%:</td>
             <td class="text-right">${sgstAmount.toFixed(2)}</td>
           </tr>
         `}
         <tr>
-          <td colspan="5" class="text-right bold">Total:</td>
+          <td colspan="4" class="text-right bold">Total:</td>
           <td class="text-right bold">${totalAmount.toFixed(2)}</td>
         </tr>
       </table>
@@ -391,8 +389,7 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
       <table>
         <thead>
           <tr>
-            <th style="width: 40%;">Description of Goods</th>
-            <th class="text-center" style="width: 12%;">HSN CODE</th>
+            <th style="width: 52%;">Description of Goods</th>
             <th class="text-center" style="width: 12%;">QTY</th>
             <th class="text-center" style="width: 12%;">Units</th>
             <th class="text-right" style="width: 12%;">RATE (Incl of Tax)</th>
@@ -403,7 +400,6 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
           ${(quotation.items || []).map((item: any) => `
             <tr>
               <td>${item.description || ''}${item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
-              <td class="text-center">${item.hsn_code || 'Shirts'}</td>
               <td class="text-center">${item.quantity || 0}</td>
               <td class="text-center">${item.unit || 'Pcs'}</td>
               <td class="text-right">${(item.rate || 0).toFixed(2)}</td>
@@ -415,34 +411,34 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
 
       <table class="totals-table">
         <tr>
-          <td colspan="5" class="text-right bold">Total:</td>
+          <td colspan="4" class="text-right bold">Total:</td>
           <td class="text-right bold">${subtotal.toFixed(2)}</td>
         </tr>
         <tr>
-          <td colspan="5" class="text-right">Discount:</td>
+          <td colspan="4" class="text-right">Discount:</td>
           <td class="text-right">0.00</td>
         </tr>
         <tr>
-          <td colspan="5" class="text-right bold">Taxable Value:</td>
+          <td colspan="4" class="text-right bold">Taxable Value:</td>
           <td class="text-right bold">${subtotal.toFixed(2)}</td>
         </tr>
         ${isIGST ? `
           <tr>
-            <td colspan="5" class="text-right">ADD IGST ${fullTaxRate}%:</td>
+            <td colspan="4" class="text-right">ADD IGST ${fullTaxRate}%:</td>
             <td class="text-right">${taxAmount.toFixed(2)}</td>
           </tr>
         ` : `
           <tr>
-            <td colspan="5" class="text-right">ADD CGST ${halfTaxRate}%:</td>
+            <td colspan="4" class="text-right">ADD CGST ${halfTaxRate}%:</td>
             <td class="text-right">${cgstAmount.toFixed(2)}</td>
           </tr>
           <tr>
-            <td colspan="5" class="text-right">ADD SGST ${halfTaxRate}%:</td>
+            <td colspan="4" class="text-right">ADD SGST ${halfTaxRate}%:</td>
             <td class="text-right">${sgstAmount.toFixed(2)}</td>
           </tr>
         `}
         <tr>
-          <td colspan="5" class="text-right bold">Total:</td>
+          <td colspan="4" class="text-right bold">Total:</td>
           <td class="text-right bold">${totalAmount.toFixed(2)}</td>
         </tr>
       </table>

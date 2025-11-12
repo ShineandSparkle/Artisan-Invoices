@@ -36,7 +36,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
   });
 
   const [items, setItems] = useState<InvoiceItem[]>([
-    { description: "", shirt_size: "", hsn_code: "", quantity: 1, rate: 0, amount: 0 }
+    { description: "", shirt_size: "", quantity: 1, rate: 0, amount: 0 }
   ]);
 
   const [loading, setLoading] = useState(false);
@@ -133,7 +133,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
   };
 
   const addItem = () => {
-    setItems([...items, { description: "", shirt_size: "", hsn_code: "", quantity: 1, rate: 0, amount: 0 }]);
+    setItems([...items, { description: "", shirt_size: "", quantity: 1, rate: 0, amount: 0 }]);
   };
 
   const removeItem = (index: number) => {
@@ -306,7 +306,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
               {items.map((item, index) => (
                 <div key={index} className="grid grid-cols-12 gap-2 items-end">
                   {index === 0 && (
-                    <div className="col-span-3">
+                    <div className="col-span-5">
                       <Label htmlFor={`description-${index}`}>Description</Label>
                       <Input
                         id={`description-${index}`}
@@ -317,7 +317,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     </div>
                   )}
                   {index > 0 && (
-                    <div className="col-span-3">
+                    <div className="col-span-5">
                       <Input
                         id={`description-${index}`}
                         value={item.description}
@@ -363,27 +363,6 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                           <SelectItem value="46">46</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-                  )}
-                  {index === 0 && (
-                    <div className="col-span-2">
-                      <Label htmlFor={`hsn_code-${index}`}>HSN Code</Label>
-                      <Input
-                        id={`hsn_code-${index}`}
-                        value={item.hsn_code}
-                        onChange={(e) => handleItemChange(index, "hsn_code", e.target.value)}
-                        placeholder="HSN Code"
-                      />
-                    </div>
-                  )}
-                  {index > 0 && (
-                    <div className="col-span-2">
-                      <Input
-                        id={`hsn_code-${index}`}
-                        value={item.hsn_code}
-                        onChange={(e) => handleItemChange(index, "hsn_code", e.target.value)}
-                        placeholder="HSN Code"
-                      />
                     </div>
                   )}
                   <div className="col-span-1">
