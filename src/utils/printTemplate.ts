@@ -6,7 +6,7 @@ const numberToWords = (num: number): string => {
   const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
 
   if (num === 0) return 'Zero';
-  
+
   const convert = (n: number): string => {
     if (n < 10) return ones[n];
     if (n < 20) return teens[n - 10];
@@ -27,6 +27,49 @@ const getTaxRate = (taxType: string) => {
   return 18;
 };
 
+const generateCommonHeader = (title: string, companySettings: CompanySettings) => `
+  <div class="header">
+    <div class="header-top">
+      <img src="/Logo - IAM Ratan.png" alt="Company Logo" class="logo" />
+      <div class="title-block">
+        <h1>${title}</h1>
+        <h2>${companySettings.name || 'Artisan Apparels'}</h2>
+        <p>${(companySettings.address || 'HIG 9A, APHB Colony, Adoni,<br>Kurnool District, Pincode - 518301')}</p>
+        <p>GSTIN No - ${companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
+      </div>
+      <div class="spacer"></div>
+    </div>
+  </div>
+`;
+
+const generateStyles = () => `
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; padding: 20px; font-size: 12px; line-height: 1.4; }
+    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .logo { height: 60px; width: auto; object-fit: contain; }
+    .title-block { flex: 1; text-align: center; }
+    .title-block h1 { font-size: 22px; text-decoration: underline; padding-bottom: 5px; }
+    .title-block h2 { font-size: 18px; margin: 5px 0; }
+    .title-block p { margin: 2px 0; }
+    .spacer { width: 60px; }
+    .invoice-info, .quotation-info { display: flex; justify-content: space-between; margin: 15px 0; padding: 10px 0; border-top: 2px solid #000; border-bottom: 2px solid #000; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+    th { background-color: #f2f2f2; font-weight: bold; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .totals-wrapper { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .totals-table { width: auto; min-width: 250px; border-collapse: collapse; font-size: 11px; }
+    .totals-table td { border: 1px solid #000; padding: 4px 6px; }
+    .amount-words { margin: 20px 0; padding: 10px; border: 1px solid #000; }
+    .footer-section { display: flex; justify-content: space-between; margin-top: 40px; }
+    .bank-details, .signature { width: 45%; border: 2px solid #000; padding: 10px; }
+    .signature { display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    @media print { body { padding: 10px; } @page { margin: 0.5cm; } }
+  </style>
+`;
+
 export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanySettings): string => {
   const subtotal = invoice.subtotal || 0;
   const taxAmount = invoice.tax_amount || 0;
@@ -36,216 +79,98 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
   const fullTaxRate = getTaxRate(invoice.tax_type || 'IGST_18');
   const halfTaxRate = fullTaxRate / 2;
   const isIGST = invoice.tax_type?.startsWith('IGST');
-  
   const amountInWords = numberToWords(Math.floor(totalAmount));
 
   return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Invoice - ${invoice.invoice_number}</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-          font-family: Arial, sans-serif; 
-          padding: 20px; 
-          font-size: 12px;
-          line-height: 1.4;
-        }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { 
-          font-size: 24px; 
-          margin-bottom: 15px; 
-          text-decoration: underline;
-        }
-        .company-details {
-          text-align: center;
-          margin-bottom: 20px;
-        }
-        .company-details h2 {
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-        .invoice-info {
-          display: flex;
-          justify-content: space-between;
-          margin: 20px 0;
-          padding: 10px 0;
-          border-top: 2px solid #000;
-          border-bottom: 2px solid #000;
-        }
-        .bill-to { margin-bottom: 15px; }
-        table { 
-          width: 100%; 
-          border-collapse: collapse; 
-          margin: 20px 0;
-        }
-        th, td { 
-          border: 1px solid #000; 
-          padding: 8px; 
-          text-align: left;
-        }
-        th { 
-          background-color: #f2f2f2; 
-          font-weight: bold;
-        }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .totals-table {
-          width: 100%;
-          margin-top: 20px;
-        }
-        .totals-table td {
-          border: 1px solid #000;
-          padding: 6px;
-        }
-        .amount-words {
-          margin: 20px 0;
-          padding: 10px;
-          border: 1px solid #000;
-        }
-        .bank-details {
-          margin: 20px 0;
-        }
-        .bank-table {
-          width: 100%;
-        }
-        .bank-table td {
-          padding: 4px 8px;
-        }
-        .signature {
-          text-align: center;
-          margin-top: 20px;
-        }
-        .bold { font-weight: bold; }
-        @media print {
-          body { padding: 10px; }
-          @page { margin: 0.5cm; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>TAX INVOICE</h1>
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Invoice - ${invoice.invoice_number}</title>
+    ${generateStyles()}
+  </head>
+  <body>
+    ${generateCommonHeader('TAX INVOICE', companySettings)}
+
+    <div class="invoice-info">
+      <div class="bill-to">
+        <p><strong>Bill to:</strong></p>
+        <p><strong>${invoice.customer_name || invoice.customer?.name || 'Customer'}</strong></p>
+        ${invoice.customer_company || invoice.customer?.company ? `<p>${invoice.customer_company || invoice.customer?.company}</p>` : ''}
+        ${invoice.customer_email || invoice.customer?.email ? `<p>Email: ${invoice.customer_email || invoice.customer?.email}</p>` : ''}
+        ${invoice.customer_phone || invoice.customer?.phone ? `<p>Contact: ${invoice.customer_phone || invoice.customer?.phone}</p>` : ''}
+        ${invoice.customer_gst_no || invoice.customer?.gst_no ? `<p>GST No: ${invoice.customer_gst_no || invoice.customer?.gst_no}</p>` : ''}
+        ${invoice.customer_address || invoice.customer?.address ? `<p>Address: ${invoice.customer_address || invoice.customer?.address}</p>` : ''}
+        ${invoice.customer_city || invoice.customer_state || invoice.customer_pincode || invoice.customer?.city || invoice.customer?.state || invoice.customer?.pincode
+          ? `<p>${[
+              invoice.customer_city || invoice.customer?.city,
+              invoice.customer_state || invoice.customer?.state,
+              invoice.customer_pincode || invoice.customer?.pincode
+            ].filter(Boolean).join(', ')}</p>`
+          : ''}
       </div>
 
-      <div class="company-details">
-        <h2>${companySettings.name || 'ARTISAN APPARELS'}</h2>
-        <p>${(companySettings.address || 'HIG 9A, APHB Colony, Adoni, Kurnool District, Pincode - 518301').replace(/,([^,]+),([^,]+)$/, ',<br>$1,$2')}</p>
-        <p>GSTIN No - ${companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
+      <div>
+        <p><strong>Invoice No:</strong> ${invoice.invoice_number}</p>
+        <p><strong>Date:</strong> ${invoice.invoice_date || invoice.date}</p>
       </div>
+    </div>
 
-      <div class="invoice-info">
-        <div class="bill-to">
-          <p><strong>Bill to:</strong> ${invoice.customer_name || invoice.customer?.name || 'Customer'}</p>
-          <p>${invoice.customer_phone || invoice.customer?.phone || invoice.customer?.mobile || invoice.customer?.contact?.phone || ''}</p>
-          <p>${invoice.customer_email || invoice.customer?.email || invoice.customer?.contact?.email || ''}</p>
-          <p>${invoice.customer_address || invoice.customer?.address || invoice.customer?.billing_address || invoice.customer?.contact?.address || ''}</p>
-          <p>${invoice.customer_gst_no || invoice.customer?.gst_no || invoice.customer?.gst || invoice.customer?.gstin || invoice.customer?.tax_id || ''}</p>
-        </div>
-        <div>
-          <p><strong>INVOICE No:</strong> ${invoice.invoice_number}</p>
-          <p><strong>Dated:</strong> ${invoice.invoice_date || invoice.date}</p>
-        </div>
-      </div>
-
-      <table>
-        <thead>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 38%;">Particulars</th>
+          <th class="text-center" style="width: 10%;">Size</th>
+          <th class="text-center" style="width: 10%;">Qty</th>
+          <th class="text-center" style="width: 10%;">Units</th>
+          <th class="text-right" style="width: 16%;">Rate</th>
+          <th class="text-right" style="width: 16%;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${(invoice.items || []).map((item: any) => `
           <tr>
-            <th style="width: 52%;">Particulars</th>
-            <th class="text-center" style="width: 12%;">QTY</th>
-            <th class="text-center" style="width: 12%;">Units</th>
-            <th class="text-right" style="width: 12%;">RATE</th>
-            <th class="text-right" style="width: 12%;">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${(invoice.items || []).map((item: any) => `
-            <tr>
-              <td>${item.description || ''}${item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
-              <td class="text-center">${item.quantity || 0}</td>
-              <td class="text-center">${item.unit || 'Pcs'}</td>
-              <td class="text-right">${(item.rate || 0).toFixed(2)}</td>
-              <td class="text-right">${(item.amount || 0).toFixed(2)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+            <td>${item.description || ''}</td>
+            <td class="text-center">${item.shirt_size || '-'}</td>
+            <td class="text-center">${item.quantity || 0}</td>
+            <td class="text-center">${item.unit || 'Pcs'}</td>
+            <td class="text-right">${(item.rate || 0).toFixed(2)}</td>
+            <td class="text-right">${(item.amount || 0).toFixed(2)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
 
+    <div class="totals-wrapper">
       <table class="totals-table">
-        <tr>
-          <td colspan="4" class="text-right bold">Total:</td>
-          <td class="text-right bold">${subtotal.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colspan="4" class="text-right">Discount:</td>
-          <td class="text-right">0.00</td>
-        </tr>
-        <tr>
-          <td colspan="4" class="text-right bold">Taxable Value:</td>
-          <td class="text-right bold">${subtotal.toFixed(2)}</td>
-        </tr>
-        ${isIGST ? `
-          <tr>
-            <td colspan="4" class="text-right">ADD IGST ${fullTaxRate}%:</td>
-            <td class="text-right">${taxAmount.toFixed(2)}</td>
-          </tr>
-        ` : `
-          <tr>
-            <td colspan="4" class="text-right">ADD CGST ${halfTaxRate}%:</td>
-            <td class="text-right">${cgstAmount.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td colspan="4" class="text-right">ADD SGST ${halfTaxRate}%:</td>
-            <td class="text-right">${sgstAmount.toFixed(2)}</td>
-          </tr>
-        `}
-        <tr>
-          <td colspan="4" class="text-right bold">Total:</td>
-          <td class="text-right bold">${totalAmount.toFixed(2)}</td>
-        </tr>
+        <tr><td colspan="4" class="text-right bold">Total:</td><td class="text-right bold">${subtotal.toFixed(2)}</td></tr>
+        <tr><td colspan="4" class="text-right">Discount:</td><td class="text-right">0.00</td></tr>
+        <tr><td colspan="4" class="text-right bold">Taxable Value:</td><td class="text-right bold">${subtotal.toFixed(2)}</td></tr>
+        ${isIGST
+          ? `<tr><td colspan="4" class="text-right">ADD IGST ${fullTaxRate}%:</td><td class="text-right">${taxAmount.toFixed(2)}</td></tr>`
+          : `<tr><td colspan="4" class="text-right">ADD CGST ${halfTaxRate}%:</td><td class="text-right">${cgstAmount.toFixed(2)}</td></tr>
+             <tr><td colspan="4" class="text-right">ADD SGST ${halfTaxRate}%:</td><td class="text-right">${sgstAmount.toFixed(2)}</td></tr>`}
+        <tr><td colspan="4" class="text-right bold">Total:</td><td class="text-right bold">${totalAmount.toFixed(2)}</td></tr>
       </table>
+    </div>
 
-      <div class="amount-words">
-        <strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only
+    <div class="amount-words"><strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only</div>
+
+    <div class="footer-section">
+      <div class="bank-details">
+        <h3>Company Bank Details</h3>
+        <p><strong>Account Name:</strong> ${companySettings.accountHolderName || companySettings.name}</p>
+        <p><strong>Bank:</strong> ${companySettings.bankName || 'HDFC Bank'}</p>
+        <p><strong>Account No:</strong> ${companySettings.accountNumber || ''}</p>
+        <p><strong>Branch:</strong> ${companySettings.branchAddress || ''}</p>
+        <p><strong>IFSC:</strong> ${companySettings.routingNumber || ''}</p>
       </div>
 
-      <div style="display: flex; justify-content: space-between; margin-top: 40px;">
-        <div class="bank-details" style="width: 55%;">
-          <h3>Company's Bank Details</h3>
-          <table class="bank-table" style="width: 100%;">
-            <tr>
-              <td><strong>Holder A/c Name</strong></td>
-              <td>${companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</td>
-            </tr>
-            <tr>
-              <td><strong>BANK NAME</strong></td>
-              <td>${companySettings.bankName || 'HDFC BANK'}</td>
-            </tr>
-            <tr>
-              <td><strong>ACCOUNT No</strong></td>
-              <td>${companySettings.accountNumber || '9998019993333'}</td>
-            </tr>
-            <tr>
-              <td><strong>BRANCH</strong></td>
-              <td>${companySettings.branchAddress || 'ADONI'}</td>
-            </tr>
-            <tr>
-              <td><strong>IFSC CODE</strong></td>
-              <td>${companySettings.routingNumber || 'HDFC0001933'}</td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="signature" style="width: 40%; text-align: center; border: 2px solid #000; padding: 20px; margin-top: 20px;">
-          <p style="margin-bottom: 60px;"><strong>For ${companySettings.name || 'ARTISAN APPARELS'}</strong></p>
-          <p><strong>Authorised Signatory</strong></p>
-        </div>
+      <div class="signature">
+        <p><strong>For ${companySettings.name || 'Artisan Apparels'}</strong></p>
+        <p style="margin-top: 40px;"><strong>Authorised Signatory</strong></p>
       </div>
-    </body>
-    </html>
-  `;
+    </div>
+  </body>
+  </html>`;
 };
 
 export const generateQuotationPrintHTML = (quotation: any, companySettings: CompanySettings): string => {
@@ -257,114 +182,20 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
   const fullTaxRate = getTaxRate(quotation.tax_type || 'IGST_18');
   const halfTaxRate = fullTaxRate / 2;
   const isIGST = quotation.tax_type?.startsWith('IGST');
-  
   const amountInWords = numberToWords(Math.floor(totalAmount));
 
   return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Quotation - ${quotation.quotation_number}</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-          font-family: Arial, sans-serif; 
-          padding: 20px; 
-          font-size: 12px;
-          line-height: 1.4;
-        }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { 
-          font-size: 24px; 
-          margin-bottom: 15px; 
-          text-decoration: underline;
-        }
-        .company-details {
-          text-align: center;
-          margin-bottom: 20px;
-        }
-        .company-details h2 {
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-        .quotation-info {
-          display: flex;
-          justify-content: space-between;
-          margin: 20px 0;
-          padding: 10px 0;
-          border-top: 2px solid #000;
-          border-bottom: 2px solid #000;
-        }
-        .bill-to { margin-bottom: 15px; }
-        table { 
-          width: 100%; 
-          border-collapse: collapse; 
-          margin: 20px 0;
-        }
-        th, td { 
-          border: 1px solid #000; 
-          padding: 8px; 
-          text-align: left;
-        }
-        th { 
-          background-color: #f2f2f2; 
-          font-weight: bold;
-        }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .totals-table {
-          width: 100%;
-          margin-top: 20px;
-        }
-        .totals-table td {
-          border: 1px solid #000;
-          padding: 6px;
-        }
-        .amount-words {
-          margin: 20px 0;
-          padding: 10px;
-          border: 1px solid #000;
-        }
-        .bank-details {
-          margin: 20px 0;
-        }
-        .bank-table {
-          width: 100%;
-        }
-        .bank-table td {
-          padding: 4px 8px;
-        }
-        .signature {
-          text-align: center;
-          margin-top: 20px;
-        }
-        .bold { font-weight: bold; }
-        .validity {
-          margin: 15px 0;
-          padding: 8px;
-          background-color: #f9f9f9;
-          border-left: 3px solid #333;
-        }
-        @media print {
-          body { padding: 10px; }
-          @page { margin: 0.5cm; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>QUOTATION</h1>
-      </div>
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Quotation - ${quotation.quotation_number}</title>
+    ${generateStyles()}
+  </head>
+  <body>
+    ${generateCommonHeader('QUOTATION', companySettings)}
 
-      <div class="company-details">
-        <h2>${companySettings.name || 'ARTISAN APPARELS'}</h2>
-        <p>${(companySettings.address || 'HIG 9A, APHB Colony, Adoni, Kurnool District, Pincode - 518301').replace(/,([^,]+),([^,]+)$/, ',<br>$1,$2')}</p>
-        <p>GSTIN No - ${companySettings.taxNumber || '37AGDPR6197G1ZW'}</p>
-      </div>
-
-      <div class="quotation-info">
-        <div class="bill-to">
+    <div class="quotation-info">
+      <div class="bill-to">
           <p><strong>To:</strong></p>
           <p><strong>${quotation.customer?.name || 'Customer'}</strong></p>
           ${quotation.customer?.company ? `<p>${quotation.customer.company}</p>` : ''}
@@ -374,112 +205,77 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
           ${quotation.customer?.address ? `<p>Address: ${quotation.customer.address}</p>` : ''}
           ${quotation.customer?.city || quotation.customer?.state || quotation.customer?.pincode ? `<p>${[quotation.customer?.city, quotation.customer?.state, quotation.customer?.pincode].filter(Boolean).join(', ')}</p>` : ''}
         </div>
-        <div>
-          <p><strong>QUOTATION No:</strong> ${quotation.quotation_number}</p>
-          <p><strong>Dated:</strong> ${quotation.date}</p>
-        </div>
+      <div>
+        <p><strong>Quotation No:</strong> ${quotation.quotation_number}</p>
+        <p><strong>Date:</strong> ${quotation.date}</p>
       </div>
-
       ${quotation.valid_until ? `
         <div class="validity">
           <strong>Valid Until:</strong> ${quotation.valid_until}
         </div>
       ` : ''}
+    </div>
 
+    ${quotation.valid_until ? `
+        <div class="validity">
+          <strong>Valid Until:</strong> ${quotation.valid_until}
+        </div>
+      ` : ''}
+    
       <table>
-        <thead>
+      <thead>
+        <tr>
+          <th style="width: 38%;">Particulars</th>
+          <th class="text-center" style="width: 10%;">Size</th>
+          <th class="text-center" style="width: 10%;">Qty</th>
+          <th class="text-center" style="width: 10%;">Units</th>
+          <th class="text-right" style="width: 16%;">Rate</th>
+          <th class="text-right" style="width: 16%;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${(quotation.items || []).map((item: any) => `
           <tr>
-            <th style="width: 52%;">Particulars</th>
-            <th class="text-center" style="width: 12%;">QTY</th>
-            <th class="text-center" style="width: 12%;">Units</th>
-            <th class="text-right" style="width: 12%;">RATE</th>
-            <th class="text-right" style="width: 12%;">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${(quotation.items || []).map((item: any) => `
-            <tr>
-              <td>${item.description || ''}${item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
-              <td class="text-center">${item.quantity || 0}</td>
-              <td class="text-center">${item.unit || 'Pcs'}</td>
-              <td class="text-right">${(item.rate || 0).toFixed(2)}</td>
-              <td class="text-right">${(item.amount || 0).toFixed(2)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+            <td>${item.description || ''}</td>
+            <td class="text-center">${item.shirt_size || '-'}</td>
+            <td class="text-center">${item.quantity || 0}</td>
+            <td class="text-center">${item.unit || 'Pcs'}</td>
+            <td class="text-right">${(item.rate || 0).toFixed(2)}</td>
+            <td class="text-right">${(item.amount || 0).toFixed(2)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
 
+    <div class="totals-wrapper">
       <table class="totals-table">
-        <tr>
-          <td colspan="4" class="text-right bold">Total:</td>
-          <td class="text-right bold">${subtotal.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colspan="4" class="text-right">Discount:</td>
-          <td class="text-right">0.00</td>
-        </tr>
-        <tr>
-          <td colspan="4" class="text-right bold">Taxable Value:</td>
-          <td class="text-right bold">${subtotal.toFixed(2)}</td>
-        </tr>
-        ${isIGST ? `
-          <tr>
-            <td colspan="4" class="text-right">ADD IGST ${fullTaxRate}%:</td>
-            <td class="text-right">${taxAmount.toFixed(2)}</td>
-          </tr>
-        ` : `
-          <tr>
-            <td colspan="4" class="text-right">ADD CGST ${halfTaxRate}%:</td>
-            <td class="text-right">${cgstAmount.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td colspan="4" class="text-right">ADD SGST ${halfTaxRate}%:</td>
-            <td class="text-right">${sgstAmount.toFixed(2)}</td>
-          </tr>
-        `}
-        <tr>
-          <td colspan="4" class="text-right bold">Total:</td>
-          <td class="text-right bold">${totalAmount.toFixed(2)}</td>
-        </tr>
+        <tr><td colspan="4" class="text-right bold">Total:</td><td class="text-right bold">${subtotal.toFixed(2)}</td></tr>
+        <tr><td colspan="4" class="text-right">Discount:</td><td class="text-right">0.00</td></tr>
+        <tr><td colspan="4" class="text-right bold">Taxable Value:</td><td class="text-right bold">${subtotal.toFixed(2)}</td></tr>
+        ${isIGST
+          ? `<tr><td colspan="4" class="text-right">ADD IGST ${fullTaxRate}%:</td><td class="text-right">${taxAmount.toFixed(2)}</td></tr>`
+          : `<tr><td colspan="4" class="text-right">ADD CGST ${halfTaxRate}%:</td><td class="text-right">${cgstAmount.toFixed(2)}</td></tr>
+             <tr><td colspan="4" class="text-right">ADD SGST ${halfTaxRate}%:</td><td class="text-right">${sgstAmount.toFixed(2)}</td></tr>`}
+        <tr><td colspan="4" class="text-right bold">Total:</td><td class="text-right bold">${totalAmount.toFixed(2)}</td></tr>
       </table>
+    </div>
 
-      <div class="amount-words">
-        <strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only
+    <div class="amount-words"><strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only</div>
+
+    <div class="footer-section">
+      <div class="bank-details">
+        <h3>Company Bank Details</h3>
+        <p><strong>Account Name:</strong> ${companySettings.accountHolderName || companySettings.name}</p>
+        <p><strong>Bank:</strong> ${companySettings.bankName || 'HDFC Bank'}</p>
+        <p><strong>Account No:</strong> ${companySettings.accountNumber || ''}</p>
+        <p><strong>Branch:</strong> ${companySettings.branchAddress || ''}</p>
+        <p><strong>IFSC:</strong> ${companySettings.routingNumber || ''}</p>
       </div>
 
-      <div style="display: flex; justify-content: space-between; margin-top: 40px;">
-        <div class="bank-details" style="width: 55%;">
-          <h3>Company's Bank Details</h3>
-          <table class="bank-table" style="width: 100%;">
-            <tr>
-              <td><strong>Holder A/c Name</strong></td>
-              <td>${companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</td>
-            </tr>
-            <tr>
-              <td><strong>BANK NAME</strong></td>
-              <td>${companySettings.bankName || 'HDFC BANK'}</td>
-            </tr>
-            <tr>
-              <td><strong>ACCOUNT No</strong></td>
-              <td>${companySettings.accountNumber || '9998019993333'}</td>
-            </tr>
-            <tr>
-              <td><strong>BRANCH</strong></td>
-              <td>${companySettings.branchAddress || 'ADONI'}</td>
-            </tr>
-            <tr>
-              <td><strong>IFSC CODE</strong></td>
-              <td>${companySettings.routingNumber || 'HDFC0001933'}</td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="signature" style="width: 40%; text-align: center; border: 2px solid #000; padding: 20px; margin-top: 20px;">
-          <p style="margin-bottom: 60px;"><strong>For ${companySettings.name || 'ARTISAN APPARELS'}</strong></p>
-          <p><strong>Authorised Signatory</strong></p>
-        </div>
+      <div class="signature">
+        <p><strong>For ${companySettings.name || 'Artisan Apparels'}</strong></p>
+        <p style="margin-top: 40px;"><strong>Authorised Signatory</strong></p>
       </div>
-    </body>
-    </html>
-  `;
+    </div>
+  </body>
+  </html>`;
 };
