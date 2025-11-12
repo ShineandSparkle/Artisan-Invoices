@@ -27,7 +27,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
   const { toast } = useToast();
   const [selectedCustomerId, setSelectedCustomerId] = useState(initialData?.customer_id || "");
   const [quotationDate, setQuotationDate] = useState(
-    initialData?.quotation_date || new Date().toISOString().split('T')[0]
+    initialData?.date || new Date().toISOString().split('T')[0]
   );
   const [validUntil, setValidUntil] = useState(
     initialData?.valid_until || (() => {
@@ -38,6 +38,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
   );
   const [notes, setNotes] = useState(initialData?.notes || "");
   const [taxRate, setTaxRate] = useState(initialData?.tax_rate || 18);
+  const [status, setStatus] = useState(initialData?.status || "save");
   const [items, setItems] = useState<QuotationItem[]>(
     initialData?.items?.length > 0 ? initialData.items : [
       { description: "", quantity: 1, rate: 0, amount: 0 }
@@ -100,20 +101,21 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
     }
 
     const quotationData = {
+      customer_id: selectedCustomerId,
       customer_name: selectedCustomer?.name,
       customer_email: selectedCustomer?.email,
       customer_phone: selectedCustomer?.phone,
       customer_address: selectedCustomer?.address,
       customer_gst_no: selectedCustomer?.gst_no,
-      quotation_date: quotationDate,
+      date: quotationDate,
       valid_until: validUntil,
       items: items,
       subtotal: subtotal,
       tax_rate: taxRate,
       tax_amount: taxAmount,
-      total_amount: total,
+      amount: total,
       notes: notes,
-      status: "save"
+      status: status
     };
 
     onSubmit(quotationData);
@@ -180,6 +182,22 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                   value={taxRate}
                   onChange={(e) => setTaxRate(Number(e.target.value))}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="save">Save</SelectItem>
+                    <SelectItem value="sent">Sent</SelectItem>
+                    <SelectItem value="accepted">Accepted</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="invoiced">Invoiced</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
