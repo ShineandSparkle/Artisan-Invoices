@@ -34,7 +34,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
     validUntil: "",
     notes: "",
     taxType: "IGST_18",
-    status: "save"
+    status: "pending"
   });
 
   const [items, setItems] = useState<QuotationItem[]>([
@@ -311,7 +311,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="save">Save</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="sent">Sent</SelectItem>
                   <SelectItem value="accepted">Accepted</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>

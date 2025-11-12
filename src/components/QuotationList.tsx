@@ -73,8 +73,9 @@ const QuotationList = ({
   });
 
   const getStatusBadge = (status: string) => {
+    const statusLower = status?.toLowerCase() || 'pending';
     const variants: Record<string, any> = {
-      save: { variant: "secondary", label: "Save" },
+      pending: { variant: "secondary", label: "Pending" },
       sent: { variant: "outline", label: "Sent" },
       accepted: { variant: "default", label: "Accepted", className: "bg-success text-success-foreground" },
       rejected: { variant: "destructive", label: "Rejected" },
@@ -82,7 +83,7 @@ const QuotationList = ({
       invoiced: { variant: "default", label: "Invoiced", className: "bg-primary text-primary-foreground" }
     };
     
-    const config = variants[status] || variants.save;
+    const config = variants[statusLower] || variants.pending;
     return (
       <Badge variant={config.variant} className={config.className}>
         {config.label}
@@ -179,7 +180,7 @@ const QuotationList = ({
                               Quotation to Invoice
                             </DropdownMenuItem>
                           )}
-                          {quotation.status === "save" && (
+                          {quotation.status === "pending" && (
                             <DropdownMenuItem onClick={() => onSendToCustomer?.(quotation.id)}>
                               <Send className="mr-2 h-4 w-4" />
                               Send to Customer
@@ -236,9 +237,9 @@ const QuotationList = ({
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-muted-foreground">
-              {filteredQuotations.filter(q => q.status === "save").length}
+              {filteredQuotations.filter(q => q.status === "pending").length}
             </div>
-            <p className="text-xs text-muted-foreground">Save</p>
+            <p className="text-xs text-muted-foreground">Pending</p>
           </CardContent>
         </Card>
       </div>

@@ -34,7 +34,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
     dueDate: "",
     notes: "",
     taxType: "IGST_18",
-    status: "draft"
+    status: "unpaid"
   });
 
   const [items, setItems] = useState<InvoiceItem[]>([

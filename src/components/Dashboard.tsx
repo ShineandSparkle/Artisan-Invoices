@@ -38,14 +38,14 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
     },
     {
       title: "Active Quotations",
-      value: quotations.filter(q => q.status === "sent" || q.status === "save").length.toString(),
+      value: quotations.filter(q => q.status === "sent" || q.status === "pending").length.toString(),
       change: "+3",
       icon: FileText,
       color: "text-primary"
     },
     {
       title: "Pending Invoices", 
-      value: invoices.filter(i => i.status === "pending" || i.status === "sent" || i.status === "draft" || i.status === "save").length.toString(),
+      value: invoices.filter(i => i.status === "pending" || i.status === "sent" || i.status === "draft" || i.status === "unpaid").length.toString(),
       change: "-2",
       icon: Receipt,
       color: "text-warning"
@@ -76,17 +76,20 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
   }));
 
   const getStatusBadge = (status: string) => {
+    const statusLower = status?.toLowerCase() || 'unpaid';
     const variants: Record<string, any> = {
       draft: { variant: "secondary", label: "Draft" },
-      save: { variant: "secondary", label: "Save" },
       sent: { variant: "outline", label: "Sent" },
       accepted: { variant: "default", label: "Accepted" },
+      invoiced: { variant: "default", label: "Invoiced", className: "bg-primary text-primary-foreground" },
+      rejected: { variant: "destructive", label: "Rejected" },
       paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground" },
       pending: { variant: "secondary", label: "Pending" },
+      unpaid: { variant: "secondary", label: "Unpaid" },
       overdue: { variant: "destructive", label: "Overdue" }
     };
     
-    const config = variants[status] || variants.save;
+    const config = variants[statusLower] || variants.unpaid;
     return (
       <Badge variant={config.variant} className={config.className}>
         {config.label}

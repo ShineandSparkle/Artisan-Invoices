@@ -75,17 +75,17 @@ const InvoiceList = ({
   });
 
   const getStatusBadge = (status: string) => {
-    const statusLower = status?.toLowerCase() || 'save';
+    const statusLower = status?.toLowerCase() || 'unpaid';
     const variants: Record<string, any> = {
-      save: { variant: "secondary", label: "Save", icon: Edit },
       draft: { variant: "secondary", label: "Draft", icon: Edit },
       sent: { variant: "outline", label: "Sent", icon: Send },
       pending: { variant: "secondary", label: "Pending", icon: Clock },
+      unpaid: { variant: "secondary", label: "Unpaid", icon: Clock },
       paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground", icon: CheckCircle },
       overdue: { variant: "destructive", label: "Overdue", icon: Clock }
     };
 
-    const config = variants[statusLower] || variants.save;
+    const config = variants[statusLower] || variants.unpaid;
     const Icon = config.icon;
     return (
       <Badge variant={config.variant} className={config.className}>
