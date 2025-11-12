@@ -33,6 +33,7 @@ export interface Customer {
   city?: string;
   state?: string;
   pincode?: string;
+  shirt_size?: string;
   created_at: string;
   updated_at: string;
   user_id?: string;

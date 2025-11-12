@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface InvoiceFormProps {
   customers: any[];
@@ -40,7 +41,24 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
   ]);
 
   const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<string[]>([]);
   const { toast } = useToast();
+
+  // Fetch unique products from stock register
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await supabase
+        .from("stock_register")
+        .select("product_name")
+        .order("product_name");
+      
+      if (data) {
+        const uniqueProducts = Array.from(new Set(data.map(p => p.product_name)));
+        setProducts(uniqueProducts);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     if (initialData && mode === 'edit') {
@@ -132,6 +150,16 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Auto-fill size when customer is selected
+    if (field === "customerId") {
+      const selectedCustomer = customers.find(c => c.id === value);
+      if (selectedCustomer?.shirt_size && items.length > 0) {
+        const newItems = [...items];
+        newItems[0] = { ...newItems[0], shirt_size: selectedCustomer.shirt_size };
+        setItems(newItems);
+      }
+    }
   };
 
   const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
@@ -322,22 +350,58 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                   {index === 0 && (
                     <div className="col-span-5">
                       <Label htmlFor={`description-${index}`}>Description</Label>
-                      <Input
-                        id={`description-${index}`}
-                        value={item.description}
-                        onChange={(e) => handleItemChange(index, "description", e.target.value)}
-                        placeholder="Item description"
-                      />
+                      <Select 
+                        value={item.description} 
+                        onValueChange={(value) => handleItemChange(index, "description", value)}
+                      >
+                        <SelectTrigger id={`description-${index}`} className="bg-background">
+                          <SelectValue placeholder="Select or type product" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="__custom__">Custom Description</SelectItem>
+                          {products.map((product) => (
+                            <SelectItem key={product} value={product}>
+                              {product}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {item.description === "__custom__" && (
+                        <Input
+                          className="mt-2"
+                          value=""
+                          onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                          placeholder="Enter custom description"
+                        />
+                      )}
                     </div>
                   )}
                   {index > 0 && (
                     <div className="col-span-5">
-                      <Input
-                        id={`description-${index}`}
-                        value={item.description}
-                        onChange={(e) => handleItemChange(index, "description", e.target.value)}
-                        placeholder="Item description"
-                      />
+                      <Select 
+                        value={item.description} 
+                        onValueChange={(value) => handleItemChange(index, "description", value)}
+                      >
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder="Select or type product" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="__custom__">Custom Description</SelectItem>
+                          {products.map((product) => (
+                            <SelectItem key={product} value={product}>
+                              {product}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {item.description === "__custom__" && (
+                        <Input
+                          className="mt-2"
+                          value=""
+                          onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                          placeholder="Enter custom description"
+                        />
+                      )}
                     </div>
                   )}
                   {index === 0 && (
