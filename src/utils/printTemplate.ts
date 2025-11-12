@@ -155,6 +155,8 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
 
     <div class="amount-words"><strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only</div>
 
+    ${invoice.notes ? `<div class="amount-words"><strong>Notes:</strong> ${invoice.notes}</div>` : ''}
+
     <div class="footer-section">
       <div class="bank-details">
         <h3>Company Bank Details</h3>
@@ -256,6 +258,8 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
     </div>
 
     <div class="amount-words"><strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only</div>
+
+    ${quotation.notes ? `<div class="amount-words"><strong>Notes:</strong> ${quotation.notes}</div>` : ''}
 
     <div class="footer-section">
       <div class="bank-details">
