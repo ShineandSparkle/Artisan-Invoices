@@ -410,19 +410,19 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                   <span>Subtotal:</span>
                   <span>₹{subtotal.toFixed(2)}</span>
                 </div>
-                {formData.taxType === 'IGST' ? (
+                {formData.taxType.startsWith('IGST') ? (
                   <div className="flex justify-between">
-                    <span>IGST (18%):</span>
+                    <span>IGST ({(taxRate * 100).toFixed(0)}%):</span>
                     <span>₹{taxAmount.toFixed(2)}</span>
                   </div>
                 ) : (
                   <>
                     <div className="flex justify-between">
-                      <span>CGST (9%):</span>
+                      <span>CGST ({(taxRate * 50).toFixed(1)}%):</span>
                       <span>₹{(taxAmount / 2).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>SGST (9%):</span>
+                      <span>SGST ({(taxRate * 50).toFixed(1)}%):</span>
                       <span>₹{(taxAmount / 2).toFixed(2)}</span>
                     </div>
                   </>
