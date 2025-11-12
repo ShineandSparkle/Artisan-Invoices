@@ -125,7 +125,7 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
                   <th className="text-left p-3 border" style={{ width: '52%' }}>Particulars</th>
                   <th className="text-center p-3 border" style={{ width: '12%' }}>QTY</th>
                   <th className="text-center p-3 border" style={{ width: '12%' }}>Units</th>
-                  <th className="text-right p-3 border" style={{ width: '12%' }}>RATE (Incl of Tax)</th>
+                  <th className="text-right p-3 border" style={{ width: '12%' }}>RATE</th>
                   <th className="text-right p-3 border" style={{ width: '12%' }}>Amount</th>
                 </tr>
               </thead>

@@ -156,7 +156,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
             <th style="width: 52%;">Particulars</th>
             <th class="text-center" style="width: 12%;">QTY</th>
             <th class="text-center" style="width: 12%;">Units</th>
-            <th class="text-right" style="width: 12%;">RATE (Incl of Tax)</th>
+            <th class="text-right" style="width: 12%;">RATE</th>
             <th class="text-right" style="width: 12%;">Amount</th>
           </tr>
         </thead>
@@ -392,7 +392,7 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
             <th style="width: 52%;">Particulars</th>
             <th class="text-center" style="width: 12%;">QTY</th>
             <th class="text-center" style="width: 12%;">Units</th>
-            <th class="text-right" style="width: 12%;">RATE (Incl of Tax)</th>
+            <th class="text-right" style="width: 12%;">RATE</th>
             <th class="text-right" style="width: 12%;">Amount</th>
           </tr>
         </thead>
