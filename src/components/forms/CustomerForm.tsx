@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { customerSchema } from "@/utils/validation";
 
 interface CustomerFormProps {
   onSubmit: (customerData: any) => Promise<void>;
@@ -47,19 +48,11 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name.trim()) {
+    const validation = customerSchema.safeParse(formData);
+    if (!validation.success) {
       toast({
         title: "Validation Error",
-        description: "Customer name is required.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a valid email address.",
+        description: validation.error.issues[0].message,
         variant: "destructive"
       });
       return;
@@ -67,10 +60,14 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
 
     setLoading(true);
     try {
-      await onSubmit(formData);
+      await onSubmit(validation.data);
       onCancel();
     } catch (error) {
-      console.error(`Error ${mode === 'edit' ? 'updating' : 'creating'} customer:`, error);
+      toast({
+        title: "Error",
+        description: `Failed to ${mode === 'edit' ? 'update' : 'create'} customer`,
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }

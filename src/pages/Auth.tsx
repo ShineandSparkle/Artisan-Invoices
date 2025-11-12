@@ -6,7 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { handleHardcodedLogin } from "@/utils/createAdminUser";
+import { z } from "zod";
+
+const authSchema = z.object({
+  email: z.string().trim().email("Invalid email address").max(255),
+  password: z.string().min(6, "Password must be at least 6 characters").max(100)
+});
 
 export default function Auth() {
   const { user, loading } = useAuth();
@@ -53,10 +58,13 @@ export default function Auth() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+
+    // Validate inputs
+    const validation = authSchema.safeParse({ email, password });
+    if (!validation.success) {
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
+        title: "Validation Error",
+        description: validation.error.issues[0].message,
         variant: "destructive",
       });
       return;
@@ -66,13 +74,15 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        // Use hardcoded login function that handles admin user creation
-        const { data, error } = await handleHardcodedLogin(email, password);
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
         if (error) {
           toast({
             title: "Login Failed",
-            description: error.message,
+            description: "Invalid login credentials",
             variant: "destructive",
             duration: 5000,            
           });
@@ -102,7 +112,7 @@ export default function Auth() {
         } else {
           toast({
             title: "Success",
-            description: "Account created successfully! Please check your email for verification.",
+            description: "Account created successfully!",
             duration: 5000,            
           });
         }
@@ -174,14 +184,6 @@ export default function Auth() {
           >
             {isSubmitting ? "Processing..." : isLogin ? "Sign In" : "Sign Up"}
           </Button>
-
-          {isLogin && (
-            <div className="mt-4 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg">
-              <p className="text-white/80 text-sm text-center mb-2">Demo Credentials:</p>
-              <p className="text-white text-sm text-center font-mono">vbhupeshkumar@gmail.com</p>
-              <p className="text-white text-sm text-center font-mono">123456</p>
-            </div>
-          )}
         </form>
 
         <div className="mt-6 text-center">
