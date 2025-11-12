@@ -153,18 +153,18 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
       <table>
         <thead>
           <tr>
-            <th>Description of Goods</th>
-            <th class="text-center">HSN CODE</th>
-            <th class="text-center">QTY</th>
-            <th class="text-center">Units</th>
-            <th class="text-right">RATE (Incl of Tax)</th>
-            <th class="text-right">Amount</th>
+            <th style="width: 40%;">Description of Goods</th>
+            <th class="text-center" style="width: 12%;">HSN CODE</th>
+            <th class="text-center" style="width: 12%;">QTY</th>
+            <th class="text-center" style="width: 12%;">Units</th>
+            <th class="text-right" style="width: 12%;">RATE (Incl of Tax)</th>
+            <th class="text-right" style="width: 12%;">Amount</th>
           </tr>
         </thead>
         <tbody>
           ${(invoice.items || []).map((item: any) => `
             <tr>
-              <td>${item.description || ''}</td>
+              <td>${item.description || ''}${item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
               <td class="text-center">${item.hsn_code || 'Shirts'}</td>
               <td class="text-center">${item.quantity || 0}</td>
               <td class="text-center">${item.unit || 'Pcs'}</td>
@@ -391,18 +391,18 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
       <table>
         <thead>
           <tr>
-            <th>Description of Goods</th>
-            <th class="text-center">HSN CODE</th>
-            <th class="text-center">QTY</th>
-            <th class="text-center">Units</th>
-            <th class="text-right">RATE (Incl of Tax)</th>
-            <th class="text-right">Amount</th>
+            <th style="width: 40%;">Description of Goods</th>
+            <th class="text-center" style="width: 12%;">HSN CODE</th>
+            <th class="text-center" style="width: 12%;">QTY</th>
+            <th class="text-center" style="width: 12%;">Units</th>
+            <th class="text-right" style="width: 12%;">RATE (Incl of Tax)</th>
+            <th class="text-right" style="width: 12%;">Amount</th>
           </tr>
         </thead>
         <tbody>
           ${(quotation.items || []).map((item: any) => `
             <tr>
-              <td>${item.description || ''}</td>
+              <td>${item.description || ''}${item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
               <td class="text-center">${item.hsn_code || 'Shirts'}</td>
               <td class="text-center">${item.quantity || 0}</td>
               <td class="text-center">${item.unit || 'Pcs'}</td>

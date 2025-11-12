@@ -20,6 +20,7 @@ interface QuotationFormProps {
 interface QuotationItem {
   description: string;
   shirt_size: string;
+  hsn_code: string;
   quantity: number;
   rate: number;
   amount: number;
@@ -36,7 +37,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
   });
 
   const [items, setItems] = useState<QuotationItem[]>([
-    { description: "", shirt_size: "", quantity: 1, rate: 0, amount: 0 }
+    { description: "", shirt_size: "", hsn_code: "", quantity: 1, rate: 0, amount: 0 }
   ]);
 
   const [loading, setLoading] = useState(false);
@@ -133,7 +134,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
   };
 
   const addItem = () => {
-    setItems([...items, { description: "", shirt_size: "", quantity: 1, rate: 0, amount: 0 }]);
+    setItems([...items, { description: "", shirt_size: "", hsn_code: "", quantity: 1, rate: 0, amount: 0 }]);
   };
 
   const removeItem = (index: number) => {
@@ -324,8 +325,8 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     </div>
                   )}
                   {index === 0 && (
-                    <div className="col-span-2">
-                      <Label htmlFor={`shirt_size-${index}`}>Shirt Size</Label>
+                    <div className="col-span-1">
+                      <Label htmlFor={`shirt_size-${index}`}>Size</Label>
                       <Select 
                         value={item.shirt_size} 
                         onValueChange={(value) => handleItemChange(index, "shirt_size", value)}
@@ -344,7 +345,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     </div>
                   )}
                   {index > 0 && (
-                    <div className="col-span-2">
+                    <div className="col-span-1">
                       <Select 
                         value={item.shirt_size} 
                         onValueChange={(value) => handleItemChange(index, "shirt_size", value)}
@@ -362,7 +363,28 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                       </Select>
                     </div>
                   )}
-                  <div className="col-span-2">
+                  {index === 0 && (
+                    <div className="col-span-2">
+                      <Label htmlFor={`hsn_code-${index}`}>HSN Code</Label>
+                      <Input
+                        id={`hsn_code-${index}`}
+                        value={item.hsn_code}
+                        onChange={(e) => handleItemChange(index, "hsn_code", e.target.value)}
+                        placeholder="HSN Code"
+                      />
+                    </div>
+                  )}
+                  {index > 0 && (
+                    <div className="col-span-2">
+                      <Input
+                        id={`hsn_code-${index}`}
+                        value={item.hsn_code}
+                        onChange={(e) => handleItemChange(index, "hsn_code", e.target.value)}
+                        placeholder="HSN Code"
+                      />
+                    </div>
+                  )}
+                  <div className="col-span-1">
                     {index === 0 && <Label htmlFor={`quantity-${index}`}>Qty</Label>}
                     <Input
                       id={`quantity-${index}`}

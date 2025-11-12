@@ -22,6 +22,17 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
   const totalAmount = invoice.total_amount || invoice.amount || 0;
   const cgstAmount = taxAmount / 2;
   const sgstAmount = taxAmount / 2;
+  
+  const getTaxRate = (taxType: string) => {
+    if (taxType?.includes('18')) return 18;
+    if (taxType?.includes('12')) return 12;
+    if (taxType?.includes('5')) return 5;
+    return 18;
+  };
+  
+  const fullTaxRate = getTaxRate(invoice.tax_type || 'IGST_18');
+  const halfTaxRate = fullTaxRate / 2;
+  const isIGST = invoice.tax_type?.startsWith('IGST');
 
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
@@ -144,19 +155,19 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
                   <td colSpan={5} className="text-right p-3 border font-semibold">Taxable Value:</td>
                   <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
                 </tr>
-                {invoice.tax_type === 'IGST' ? (
+                {isIGST ? (
                   <tr>
-                    <td colSpan={5} className="text-right p-3 border">ADD IGST 18%:</td>
+                    <td colSpan={5} className="text-right p-3 border">ADD IGST {fullTaxRate}%:</td>
                     <td className="text-right p-3 border">₹{taxAmount.toFixed(2)}</td>
                   </tr>
                 ) : (
                   <>
                     <tr>
-                      <td colSpan={5} className="text-right p-3 border">ADD CGST 9%:</td>
+                      <td colSpan={5} className="text-right p-3 border">ADD CGST {halfTaxRate}%:</td>
                       <td className="text-right p-3 border">₹{cgstAmount.toFixed(2)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={5} className="text-right p-3 border">ADD SGST 9%:</td>
+                      <td colSpan={5} className="text-right p-3 border">ADD SGST {halfTaxRate}%:</td>
                       <td className="text-right p-3 border">₹{sgstAmount.toFixed(2)}</td>
                     </tr>
                   </>
