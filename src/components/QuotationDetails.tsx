@@ -104,18 +104,25 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
                 </p>
               )}
               </div>
-            <div className="text-right">
-              <p className="text-sm"><span className="font-semibold">QUOTATION No:</span> {quotation.quotation_number}</p>
-              <p className="text-sm"><span className="font-semibold">Dated:</span> {quotation.date}</p>
-              <p className="text-sm mt-2">{getStatusBadge(quotation.status)}</p>
+
+              <div className="text-right space-y-2">
+              <p className="text-sm">
+                <span className="font-semibold">QUOTATION No:</span> {quotation.quotation_number}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Dated:</span> {quotation.date}
+              </p>
+
+              {quotation.valid_until && (
+                <div className="text-sm">
+                  <p className="text-sm">
+                    <span className="font-semibold">Valid Until:</span> {quotation.valid_until}
+                  </p>
+                </div>
+              )}
+              <p className="text-sm">{getStatusBadge(quotation.status)}</p>
             </div>
           </div>
-
-          {quotation.valid_until && (
-            <div className="bg-muted p-3 rounded border-l-4 border-primary">
-              <p className="text-sm"><span className="font-semibold">Valid Until:</span> {quotation.valid_until}</p>
-            </div>
-          )}
 
           {/* Items Table */}
           <div className="border rounded-lg overflow-hidden">

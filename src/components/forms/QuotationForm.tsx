@@ -343,7 +343,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
 
               <div>
                 <Label>Tax Type</Label>
-                <div className="mt-2 grid grid-cols-1 gap-2">
+                <div className="mt-2 grid grid-cols-2 gap-3">
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -355,6 +355,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     />
                     IGST 18%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -366,6 +367,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     />
                     CGST 9% & SGST 9%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -377,6 +379,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     />
                     IGST 12%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -388,6 +391,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     />
                     CGST 6% & SGST 6%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -399,6 +403,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     />
                     IGST 5%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -413,7 +418,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                 </div>
               </div>
 
-              <div>
+              <div className="pt-6">
                 <Label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -424,6 +429,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                   Complimentary
                 </Label>
               </div>
+
             </div>
           </div>
 

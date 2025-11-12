@@ -217,12 +217,6 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
       ` : ''}
       </div>
     </div>
-
-    ${quotation.valid_until ? `
-        <div class="validity">
-          <strong>Valid Until:</strong> ${quotation.valid_until}
-        </div>
-      ` : ''}
     
       <table>
       <thead>

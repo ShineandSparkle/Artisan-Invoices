@@ -357,8 +357,8 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
               </div>
 
               <div>
-                <Label>Tax Type</Label>
-                <div className="mt-2 grid grid-cols-1 gap-2">
+                <Label>Tax Type</Label>               
+                <div className="mt-2 grid grid-cols-2 gap-3">
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -370,6 +370,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     />
                     IGST 18%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -381,6 +382,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     />
                     CGST 9% & SGST 9%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -392,6 +394,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     />
                     IGST 12%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -403,6 +406,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     />
                     CGST 6% & SGST 6%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -414,6 +418,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     />
                     IGST 5%
                   </Label>
+
                   <Label className="flex items-center">
                     <input
                       type="radio"
@@ -426,10 +431,11 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     CGST 2.5% & SGST 2.5%
                   </Label>
                 </div>
+
               </div>
 
               <div>
-                <Label className="flex items-center gap-2">
+                <Label className="flex items-center gap-3 pt-4">
                   <input
                     type="checkbox"
                     checked={formData.complimentary}
