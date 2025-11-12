@@ -33,7 +33,7 @@ interface StockEntry {
 }
 
 const SIZES = ["39", "40", "42", "44", "46"];
-const PRODUCTS = ["Black Jacuard", "White Jacquard", "Light Blue", "Ratan Blue", "Dark Blue", "Black", "Brown", "Green", "Jute White", "Lenin White", "Light Grey" , "Blue Pattern", "White Pattern", "White Soft Pattern", "White Premium", "Peach"];
+const PRODUCTS = ["Dark Blue", "Ratan Blue", "White", "Black Plain", "Brown", "White Jacuard", "Black Jacuard",  "White Dotted Pattern", "Blue Dotted Pattern", "Light Blue", "Light Grey" , "Green", "Peach", "Jute White", "Lenin White", "White Soft Pattern", "White Premium"];
 
 const MONTHS = [
   { value: 1, label: "January" },
