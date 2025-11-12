@@ -267,172 +267,178 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       <CardContent className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="customer">Customer *</Label>
-              <Select value={formData.customerId} onValueChange={(value) => handleChange("customerId", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a customer" />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="customer">Customer *</Label>
+                <Select value={formData.customerId} onValueChange={(value) => handleChange("customerId", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a customer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {customer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.complimentary}
-                  onChange={(e) => handleChange('complimentary', e.target.checked)}
-                  className="h-4 w-4"
+              <div>
+                <Label htmlFor="date">Invoice Date</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => handleChange("date", e.target.value)}
                 />
-                Complimentary
-              </Label>
-            </div>
+              </div>
 
-            <div>
-              <Label>Tax Mode</Label>
-              <div className="mt-2 flex gap-4">
-                <Label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="taxMode"
-                    value="exclusive"
-                    checked={formData.taxMode === 'exclusive'}
-                    onChange={(e) => handleChange('taxMode', e.target.value)}
-                    className="mr-2"
-                    disabled={formData.complimentary}
-                  />
-                  Exclusive Tax
-                </Label>
-                <Label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="taxMode"
-                    value="inclusive"
-                    checked={formData.taxMode === 'inclusive'}
-                    onChange={(e) => handleChange('taxMode', e.target.value)}
-                    className="mr-2"
-                    disabled={formData.complimentary}
-                  />
-                  Inclusive Tax
-                </Label>
+              <div>
+                <Label htmlFor="dueDate">Due Date</Label>
+                <Input
+                  id="dueDate"
+                  type="date"
+                  value={formData.dueDate}
+                  onChange={(e) => handleChange("dueDate", e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="status">Status</Label>
+                <Select value={formData.status} onValueChange={(value) => handleChange("status", value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="sent">Sent</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="unpaid">Unpaid</SelectItem>
+                    <SelectItem value="overdue">Overdue</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            <div className="md:col-span-2">
-              <Label>Tax Type</Label>
-              <div className="mt-2 grid grid-cols-2 gap-4">
-                <Label className="flex items-center">
+            {/* Right Column */}
+            <div className="space-y-4">
+              <div>
+                <Label>Tax Mode</Label>
+                <div className="mt-2 flex gap-4">
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxMode"
+                      value="exclusive"
+                      checked={formData.taxMode === 'exclusive'}
+                      onChange={(e) => handleChange('taxMode', e.target.value)}
+                      className="mr-2"
+                      disabled={formData.complimentary}
+                    />
+                    Exclusive Tax
+                  </Label>
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxMode"
+                      value="inclusive"
+                      checked={formData.taxMode === 'inclusive'}
+                      onChange={(e) => handleChange('taxMode', e.target.value)}
+                      className="mr-2"
+                      disabled={formData.complimentary}
+                    />
+                    Inclusive Tax
+                  </Label>
+                </div>
+              </div>
+
+              <div>
+                <Label>Tax Type</Label>
+                <div className="mt-2 grid grid-cols-1 gap-2">
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxType"
+                      value="IGST_18"
+                      checked={formData.taxType === 'IGST_18'}
+                      onChange={(e) => handleChange('taxType', e.target.value)}
+                      className="mr-2"
+                    />
+                    IGST 18%
+                  </Label>
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxType"
+                      value="CGST_SGST_18"
+                      checked={formData.taxType === 'CGST_SGST_18'}
+                      onChange={(e) => handleChange('taxType', e.target.value)}
+                      className="mr-2"
+                    />
+                    CGST 9% & SGST 9%
+                  </Label>
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxType"
+                      value="IGST_12"
+                      checked={formData.taxType === 'IGST_12'}
+                      onChange={(e) => handleChange('taxType', e.target.value)}
+                      className="mr-2"
+                    />
+                    IGST 12%
+                  </Label>
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxType"
+                      value="CGST_SGST_12"
+                      checked={formData.taxType === 'CGST_SGST_12'}
+                      onChange={(e) => handleChange('taxType', e.target.value)}
+                      className="mr-2"
+                    />
+                    CGST 6% & SGST 6%
+                  </Label>
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxType"
+                      value="IGST_5"
+                      checked={formData.taxType === 'IGST_5'}
+                      onChange={(e) => handleChange('taxType', e.target.value)}
+                      className="mr-2"
+                    />
+                    IGST 5%
+                  </Label>
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxType"
+                      value="CGST_SGST_5"
+                      checked={formData.taxType === 'CGST_SGST_5'}
+                      onChange={(e) => handleChange('taxType', e.target.value)}
+                      className="mr-2"
+                    />
+                    CGST 2.5% & SGST 2.5%
+                  </Label>
+                </div>
+              </div>
+
+              <div>
+                <Label className="flex items-center gap-2">
                   <input
-                    type="radio"
-                    name="taxType"
-                    value="IGST_18"
-                    checked={formData.taxType === 'IGST_18'}
-                    onChange={(e) => handleChange('taxType', e.target.value)}
-                    className="mr-2"
+                    type="checkbox"
+                    checked={formData.complimentary}
+                    onChange={(e) => handleChange('complimentary', e.target.checked)}
+                    className="h-4 w-4"
                   />
-                  IGST 18%
-                </Label>
-                <Label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="taxType"
-                    value="CGST_SGST_18"
-                    checked={formData.taxType === 'CGST_SGST_18'}
-                    onChange={(e) => handleChange('taxType', e.target.value)}
-                    className="mr-2"
-                  />
-                  CGST 9% & SGST 9%
-                </Label>
-                <Label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="taxType"
-                    value="IGST_12"
-                    checked={formData.taxType === 'IGST_12'}
-                    onChange={(e) => handleChange('taxType', e.target.value)}
-                    className="mr-2"
-                  />
-                  IGST 12%
-                </Label>
-                <Label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="taxType"
-                    value="CGST_SGST_12"
-                    checked={formData.taxType === 'CGST_SGST_12'}
-                    onChange={(e) => handleChange('taxType', e.target.value)}
-                    className="mr-2"
-                  />
-                  CGST 6% & SGST 6%
-                </Label>
-                <Label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="taxType"
-                    value="IGST_5"
-                    checked={formData.taxType === 'IGST_5'}
-                    onChange={(e) => handleChange('taxType', e.target.value)}
-                    className="mr-2"
-                  />
-                  IGST 5%
-                </Label>
-                <Label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="taxType"
-                    value="CGST_SGST_5"
-                    checked={formData.taxType === 'CGST_SGST_5'}
-                    onChange={(e) => handleChange('taxType', e.target.value)}
-                    className="mr-2"
-                  />
-                  CGST 2.5% & SGST 2.5%
+                  Complimentary
                 </Label>
               </div>
-            </div>
-
-            <div>
-              <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(value) => handleChange("status", value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="sent">Sent</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="unpaid">Unpaid</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="date">Invoice Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) => handleChange("date", e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="dueDate">Due Date</Label>
-              <Input
-                id="dueDate"
-                type="date"
-                value={formData.dueDate}
-                onChange={(e) => handleChange("dueDate", e.target.value)}
-              />
             </div>
           </div>
 
