@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 import {
   Table,
   TableBody,
@@ -64,10 +67,25 @@ interface CustomerListProps {
   onDelete: (customerId: string) => void;
 }
 
+const customerImportSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(200),
+  shirt_size: z.string().trim().max(50).optional(),
+  email: z.string().trim().email("Invalid email").max(255).optional().or(z.literal("")),
+  phone: z.string().trim().max(20).optional(),
+  company: z.string().trim().max(200).optional(),
+  gst_no: z.string().trim().max(50).optional(),
+  address: z.string().trim().max(500).optional(),
+  city: z.string().trim().max(100).optional(),
+  state: z.string().trim().max(100).optional(),
+  pincode: z.string().trim().max(20).optional(),
+});
+
 const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, onDelete }: CustomerListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showViewDialog, setShowViewDialog] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const { toast } = useToast();
 
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
@@ -155,21 +173,153 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
     window.URL.revokeObjectURL(url);
   };
 
+  const parseCSV = (text: string): Record<string, string>[] => {
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return [];
+    
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const rows: Record<string, string>[] = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+      const values: string[] = [];
+      let currentValue = '';
+      let insideQuotes = false;
+      
+      for (let j = 0; j < lines[i].length; j++) {
+        const char = lines[i][j];
+        if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          values.push(currentValue.trim());
+          currentValue = '';
+        } else {
+          currentValue += char;
+        }
+      }
+      values.push(currentValue.trim());
+      
+      const row: Record<string, string> = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+      rows.push(row);
+    }
+    
+    return rows;
+  };
+
+  const mapCSVToCustomer = (row: Record<string, string>) => {
+    return {
+      name: row['Customer Name'] || row['name'] || '',
+      shirt_size: row['Size'] || row['shirt_size'] || '',
+      email: row['Email'] || row['email'] || '',
+      phone: row['Phone'] || row['phone'] || '',
+      company: row['Company'] || row['company'] || '',
+      gst_no: row['GST No'] || row['gst_no'] || '',
+      address: row['Address'] || row['address'] || '',
+      city: row['City'] || row['city'] || '',
+      state: row['State'] || row['state'] || '',
+      pincode: row['Pincode'] || row['pincode'] || '',
+    };
+  };
+
   const handleImport = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.csv';
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const text = event.target?.result as string;
-          console.log('CSV content:', text);
-          // TODO: Implement CSV parsing and customer creation
-          alert('Import functionality will be implemented soon');
-        };
-        reader.readAsText(file);
+      if (!file) return;
+
+      setIsImporting(true);
+      try {
+        const text = await file.text();
+        const rows = parseCSV(text);
+        
+        if (rows.length === 0) {
+          toast({
+            title: "Import Failed",
+            description: "No valid data found in CSV file",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          toast({
+            title: "Authentication Error",
+            description: "You must be logged in to import customers",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Validate and prepare customers
+        const validCustomers = [];
+        const errors = [];
+        
+        for (let i = 0; i < rows.length; i++) {
+          try {
+            const mappedData = mapCSVToCustomer(rows[i]);
+            const validated = customerImportSchema.parse(mappedData);
+            validCustomers.push({
+              ...validated,
+              user_id: user.id,
+              email: validated.email || null,
+              phone: validated.phone || null,
+              company: validated.company || null,
+              gst_no: validated.gst_no || null,
+              address: validated.address || null,
+              city: validated.city || null,
+              state: validated.state || null,
+              pincode: validated.pincode || null,
+              shirt_size: validated.shirt_size || null,
+            });
+          } catch (error) {
+            if (error instanceof z.ZodError) {
+              errors.push(`Row ${i + 2}: ${error.issues[0].message}`);
+            } else {
+              errors.push(`Row ${i + 2}: Invalid data`);
+            }
+          }
+        }
+
+        if (validCustomers.length === 0) {
+          toast({
+            title: "Import Failed",
+            description: errors.length > 0 ? errors.join(', ') : "No valid customers found",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Insert customers in batches
+        const { data, error } = await supabase
+          .from('customers')
+          .insert(validCustomers)
+          .select();
+
+        if (error) throw error;
+
+        toast({
+          title: "Import Successful",
+          description: `${validCustomers.length} customer(s) imported successfully${errors.length > 0 ? `. ${errors.length} row(s) skipped due to errors.` : ''}`,
+        });
+
+        // Refresh the page or refetch customers
+        window.location.reload();
+
+      } catch (error) {
+        console.error('Import error:', error);
+        toast({
+          title: "Import Failed",
+          description: error instanceof Error ? error.message : "Failed to import customers",
+          variant: "destructive",
+        });
+      } finally {
+        setIsImporting(false);
       }
     };
     input.click();
@@ -232,9 +382,9 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>
-          <Button variant="outline" onClick={handleImport}>
+          <Button variant="outline" onClick={handleImport} disabled={isImporting}>
             <Upload className="mr-2 h-4 w-4" />
-            Import
+            {isImporting ? "Importing..." : "Import"}
           </Button>
           <Button variant="outline" onClick={handleExport}>
             <Download className="mr-2 h-4 w-4" />
@@ -257,6 +407,7 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-16">Sl.No</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Size</TableHead>
                   <TableHead>Contact</TableHead>
@@ -268,13 +419,16 @@ const CustomerList = ({ customers, onCreateNew, onViewCustomer, onEditCustomer, 
               <TableBody>
                 {filteredCustomers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-6">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
                       No customers found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredCustomers.map((customer) => (
+                  filteredCustomers.map((customer, index) => (
                     <TableRow key={customer.id} className="hover:bg-muted/50">
+                      <TableCell className="text-muted-foreground">
+                        {index + 1}
+                      </TableCell>
                       <TableCell>
                         <div className="font-medium">{customer.name}</div>
                       </TableCell>
