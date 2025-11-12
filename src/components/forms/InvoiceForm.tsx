@@ -19,6 +19,7 @@ interface InvoiceFormProps {
 
 interface InvoiceItem {
   description: string;
+  shirt_size: string;
   quantity: number;
   rate: number;
   amount: number;
@@ -30,12 +31,12 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
     date: new Date().toISOString().split('T')[0],
     dueDate: "",
     notes: "",
-    taxType: "IGST",
+    taxType: "IGST_18",
     status: "save"
   });
 
   const [items, setItems] = useState<InvoiceItem[]>([
-    { description: "", quantity: 1, rate: 0, amount: 0 }
+    { description: "", shirt_size: "", quantity: 1, rate: 0, amount: 0 }
   ]);
 
   const [loading, setLoading] = useState(false);
@@ -48,7 +49,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
         date: initialData.date || new Date().toISOString().split('T')[0],
         dueDate: initialData.due_date || "",
         notes: initialData.notes || "",
-        taxType: initialData.tax_type || "IGST",
+        taxType: initialData.tax_type || "IGST_18",
         status: initialData.status || "save"
       });
       setItems(initialData.items || []);
@@ -67,7 +68,9 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       return;
     }
 
-    const validItems = items.filter(item => item.description.trim() && item.quantity > 0 && item.rate > 0);
+    const validItems = items.filter(item => 
+      (item.description.trim() || item.shirt_size.trim()) && item.quantity > 0 && item.rate > 0
+    );
     
     if (validItems.length === 0) {
       toast({
@@ -80,7 +83,13 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
 
     // Calculate totals
     const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
-    const taxRate = formData.taxType === 'IGST' ? 0.18 : 0.18; // Both options are 18% total
+    const getTaxRate = (taxType: string) => {
+      if (taxType.includes('18')) return 0.18;
+      if (taxType.includes('12')) return 0.12;
+      if (taxType.includes('5')) return 0.05;
+      return 0.18;
+    };
+    const taxRate = getTaxRate(formData.taxType);
     const taxAmount = subtotal * taxRate;
     const grandTotal = subtotal + taxAmount;
 
@@ -124,7 +133,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
   };
 
   const addItem = () => {
-    setItems([...items, { description: "", quantity: 1, rate: 0, amount: 0 }]);
+    setItems([...items, { description: "", shirt_size: "", quantity: 1, rate: 0, amount: 0 }]);
   };
 
   const removeItem = (index: number) => {
@@ -135,7 +144,13 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
 
   // Calculate totals for display
   const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
-  const taxRate = formData.taxType === 'IGST' ? 0.18 : 0.18;
+  const getTaxRate = (taxType: string) => {
+    if (taxType.includes('18')) return 0.18;
+    if (taxType.includes('12')) return 0.12;
+    if (taxType.includes('5')) return 0.05;
+    return 0.18;
+  };
+  const taxRate = getTaxRate(formData.taxType);
   const taxAmount = subtotal * taxRate;
   const grandTotal = subtotal + taxAmount;
 
@@ -170,13 +185,13 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
 
             <div>
               <Label>Tax Type</Label>
-              <div className="mt-2 flex gap-6">
+              <div className="mt-2 grid grid-cols-2 gap-4">
                 <Label className="flex items-center">
                   <input
                     type="radio"
                     name="taxType"
-                    value="IGST"
-                    checked={formData.taxType === 'IGST'}
+                    value="IGST_18"
+                    checked={formData.taxType === 'IGST_18'}
                     onChange={(e) => handleChange('taxType', e.target.value)}
                     className="mr-2"
                   />
@@ -186,12 +201,56 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                   <input
                     type="radio"
                     name="taxType"
-                    value="CGST_SGST"
-                    checked={formData.taxType === 'CGST_SGST'}
+                    value="CGST_SGST_18"
+                    checked={formData.taxType === 'CGST_SGST_18'}
                     onChange={(e) => handleChange('taxType', e.target.value)}
                     className="mr-2"
                   />
                   CGST 9% & SGST 9%
+                </Label>
+                <Label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="taxType"
+                    value="IGST_12"
+                    checked={formData.taxType === 'IGST_12'}
+                    onChange={(e) => handleChange('taxType', e.target.value)}
+                    className="mr-2"
+                  />
+                  IGST 12%
+                </Label>
+                <Label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="taxType"
+                    value="CGST_SGST_12"
+                    checked={formData.taxType === 'CGST_SGST_12'}
+                    onChange={(e) => handleChange('taxType', e.target.value)}
+                    className="mr-2"
+                  />
+                  CGST 6% & SGST 6%
+                </Label>
+                <Label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="taxType"
+                    value="IGST_5"
+                    checked={formData.taxType === 'IGST_5'}
+                    onChange={(e) => handleChange('taxType', e.target.value)}
+                    className="mr-2"
+                  />
+                  IGST 5%
+                </Label>
+                <Label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="taxType"
+                    value="CGST_SGST_5"
+                    checked={formData.taxType === 'CGST_SGST_5'}
+                    onChange={(e) => handleChange('taxType', e.target.value)}
+                    className="mr-2"
+                  />
+                  CGST 2.5% & SGST 2.5%
                 </Label>
               </div>
             </div>
@@ -246,17 +305,68 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
             <div className="space-y-4">
               {items.map((item, index) => (
                 <div key={index} className="grid grid-cols-12 gap-2 items-end">
-                  <div className="col-span-5">
-                    <Label htmlFor={`description-${index}`}>Description</Label>
-                    <Input
-                      id={`description-${index}`}
-                      value={item.description}
-                      onChange={(e) => handleItemChange(index, "description", e.target.value)}
-                      placeholder="Item description"
-                    />
-                  </div>
+                  {index === 0 && (
+                    <div className="col-span-3">
+                      <Label htmlFor={`description-${index}`}>Description</Label>
+                      <Input
+                        id={`description-${index}`}
+                        value={item.description}
+                        onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                        placeholder="Item description"
+                      />
+                    </div>
+                  )}
+                  {index > 0 && (
+                    <div className="col-span-3">
+                      <Input
+                        id={`description-${index}`}
+                        value={item.description}
+                        onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                        placeholder="Item description"
+                      />
+                    </div>
+                  )}
+                  {index === 0 && (
+                    <div className="col-span-2">
+                      <Label htmlFor={`shirt_size-${index}`}>Shirt Size</Label>
+                      <Select 
+                        value={item.shirt_size} 
+                        onValueChange={(value) => handleItemChange(index, "shirt_size", value)}
+                      >
+                        <SelectTrigger id={`shirt_size-${index}`} className="bg-background">
+                          <SelectValue placeholder="Size" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="39">39</SelectItem>
+                          <SelectItem value="40">40</SelectItem>
+                          <SelectItem value="42">42</SelectItem>
+                          <SelectItem value="44">44</SelectItem>
+                          <SelectItem value="46">46</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  {index > 0 && (
+                    <div className="col-span-2">
+                      <Select 
+                        value={item.shirt_size} 
+                        onValueChange={(value) => handleItemChange(index, "shirt_size", value)}
+                      >
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder="Size" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="39">39</SelectItem>
+                          <SelectItem value="40">40</SelectItem>
+                          <SelectItem value="42">42</SelectItem>
+                          <SelectItem value="44">44</SelectItem>
+                          <SelectItem value="46">46</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div className="col-span-2">
-                    <Label htmlFor={`quantity-${index}`}>Qty</Label>
+                    {index === 0 && <Label htmlFor={`quantity-${index}`}>Qty</Label>}
                     <Input
                       id={`quantity-${index}`}
                       type="number"
@@ -266,7 +376,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     />
                   </div>
                   <div className="col-span-2">
-                    <Label htmlFor={`rate-${index}`}>Rate</Label>
+                    {index === 0 && <Label htmlFor={`rate-${index}`}>Rate</Label>}
                     <Input
                       id={`rate-${index}`}
                       type="number"
@@ -277,7 +387,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     />
                   </div>
                   <div className="col-span-2">
-                    <Label>Amount</Label>
+                    {index === 0 && <Label>Amount</Label>}
                     <Input value={`₹${item.amount.toFixed(2)}`} disabled />
                   </div>
                   <div className="col-span-1">

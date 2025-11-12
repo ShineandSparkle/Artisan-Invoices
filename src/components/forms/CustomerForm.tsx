@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { customerSchema } from "@/utils/validation";
 
@@ -22,6 +23,7 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
     company: "",
     address: "",
     gst_no: "",
+    shirt_size: "",
     city: "",
     state: "",
     pincode: ""
@@ -38,6 +40,7 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
         company: initialData.company || "",
         address: initialData.address || "",
         gst_no: initialData.gst_no || "",
+        shirt_size: initialData.shirt_size || "",
         city: initialData.city || "",
         state: initialData.state || "",
         pincode: initialData.pincode || ""
@@ -136,6 +139,22 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
                 onChange={(e) => handleChange("gst_no", e.target.value)}
                 placeholder="Enter GST number"
               />
+            </div>
+
+            <div>
+              <Label htmlFor="shirt_size">Shirt Size</Label>
+              <Select value={formData.shirt_size} onValueChange={(value) => handleChange("shirt_size", value)}>
+                <SelectTrigger id="shirt_size" className="bg-background">
+                  <SelectValue placeholder="Select size" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="39">39</SelectItem>
+                  <SelectItem value="40">40</SelectItem>
+                  <SelectItem value="42">42</SelectItem>
+                  <SelectItem value="44">44</SelectItem>
+                  <SelectItem value="46">46</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

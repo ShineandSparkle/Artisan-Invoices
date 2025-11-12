@@ -6,6 +6,7 @@ export const customerSchema = z.object({
   phone: z.string().trim().regex(/^[0-9+\-\s()]*$/, "Invalid phone number").max(20).optional().or(z.literal("")),
   company: z.string().trim().max(200).optional().or(z.literal("")),
   gst_no: z.string().trim().max(15).optional().or(z.literal("")),
+  shirt_size: z.string().trim().max(10).optional().or(z.literal("")),
   address: z.string().trim().max(500).optional().or(z.literal("")),
   city: z.string().trim().max(100).optional().or(z.literal("")),
   state: z.string().trim().max(100).optional().or(z.literal("")),
@@ -13,7 +14,8 @@ export const customerSchema = z.object({
 });
 
 export const invoiceItemSchema = z.object({
-  description: z.string().trim().min(1, "Description is required").max(500),
+  description: z.string().trim().max(500).optional().or(z.literal("")),
+  shirt_size: z.string().trim().max(10).optional().or(z.literal("")),
   quantity: z.number().int().positive("Quantity must be positive").max(999999),
   rate: z.number().positive("Rate must be positive").max(99999999),
   amount: z.number().positive().max(99999999)
@@ -31,7 +33,8 @@ export const invoiceSchema = z.object({
 });
 
 export const quotationItemSchema = z.object({
-  description: z.string().trim().min(1, "Description is required").max(500),
+  description: z.string().trim().max(500).optional().or(z.literal("")),
+  shirt_size: z.string().trim().max(10).optional().or(z.literal("")),
   quantity: z.number().int().positive("Quantity must be positive").max(999999),
   rate: z.number().positive("Rate must be positive").max(99999999)
 });

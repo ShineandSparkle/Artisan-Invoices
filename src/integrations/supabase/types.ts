@@ -26,6 +26,7 @@ export type Database = {
           name: string
           phone: string | null
           pincode: string | null
+          shirt_size: string | null
           state: string | null
           updated_at: string
           user_id: string | null
@@ -41,6 +42,7 @@ export type Database = {
           name: string
           phone?: string | null
           pincode?: string | null
+          shirt_size?: string | null
           state?: string | null
           updated_at?: string
           user_id?: string | null
@@ -56,6 +58,7 @@ export type Database = {
           name?: string
           phone?: string | null
           pincode?: string | null
+          shirt_size?: string | null
           state?: string | null
           updated_at?: string
           user_id?: string | null
