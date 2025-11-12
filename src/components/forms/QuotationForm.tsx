@@ -24,6 +24,7 @@ interface QuotationItem {
   quantity: number;
   rate: number;
   amount: number;
+  customDescription?: string;
 }
 
 const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'create' }: QuotationFormProps) => {
@@ -70,9 +71,22 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
         taxType: initialData.tax_type || "IGST_18",
         status: initialData.status || "save"
       });
-      setItems(initialData.items || []);
+      
+      // Process items to handle products not in dropdown
+      const processedItems = (initialData.items || []).map((item: QuotationItem) => {
+        const isInProductList = products.includes(item.description);
+        if (!isInProductList && item.description) {
+          return {
+            ...item,
+            description: "__custom__",
+            customDescription: item.description
+          };
+        }
+        return item;
+      });
+      setItems(processedItems);
     }
-  }, [initialData, mode]);
+  }, [initialData, mode, products]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,8 +113,16 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
       return;
     }
 
-    // Calculate totals
-    const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
+    // Process items to use custom description if applicable
+    const processedItems = validItems.map(item => {
+      if (item.description === "__custom__" && item.customDescription) {
+        return { ...item, description: item.customDescription, customDescription: undefined };
+      }
+      return item;
+    });
+
+    // Calculate totals using processed items
+    const subtotal = processedItems.reduce((sum, item) => sum + (item.amount || 0), 0);
     const getTaxRate = (taxType: string) => {
       if (taxType.includes('18')) return 0.18;
       if (taxType.includes('12')) return 0.12;
@@ -117,7 +139,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
       valid_until: formData.validUntil,
       notes: formData.notes,
       tax_type: formData.taxType,
-      items: items,
+      items: processedItems,
       amount: grandTotal,
       subtotal: subtotal,
       tax_amount: taxAmount,
@@ -354,8 +376,12 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                       {item.description === "__custom__" && (
                         <Input
                           className="mt-2"
-                          value=""
-                          onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                          value={item.customDescription || ""}
+                          onChange={(e) => {
+                            const newItems = [...items];
+                            newItems[index] = { ...newItems[index], customDescription: e.target.value };
+                            setItems(newItems);
+                          }}
                           placeholder="Enter custom description"
                         />
                       )}
@@ -382,8 +408,12 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                       {item.description === "__custom__" && (
                         <Input
                           className="mt-2"
-                          value=""
-                          onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                          value={item.customDescription || ""}
+                          onChange={(e) => {
+                            const newItems = [...items];
+                            newItems[index] = { ...newItems[index], customDescription: e.target.value };
+                            setItems(newItems);
+                          }}
                           placeholder="Enter custom description"
                         />
                       )}
