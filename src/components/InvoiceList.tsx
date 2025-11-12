@@ -54,17 +54,25 @@ const InvoiceList = ({
   const [searchTerm, setSearchTerm] = useState("");
   const { companySettings } = useSettings();
 
-  const displayInvoices = invoices.map(i => ({
-    id: i.id,
-    invoiceNumber: i.invoice_number,
-    customer: i.customer_name || "Unknown Customer",
-    amount: i.total_amount || i.subtotal || 0,
-    status: i.status,
-    date: i.invoice_date,
-    dueDate: i.due_date,
-    paidDate: i.paid_date || "-",
-    fullInvoice: i
-  }));
+  const displayInvoices = invoices.map(i => {
+    const shirtSizes = i.items
+      .map((item: any) => item.shirt_size)
+      .filter((size: string) => size)
+      .join(', ');
+    
+    return {
+      id: i.id,
+      invoiceNumber: i.invoice_number,
+      customer: i.customer_name || "Unknown Customer",
+      amount: i.total_amount || i.subtotal || 0,
+      status: i.status,
+      date: i.invoice_date,
+      dueDate: i.due_date || "-",
+      paidDate: i.paid_date || "-",
+      shirtSizes: shirtSizes || '-',
+      fullInvoice: i
+    };
+  });
 
   const getStatusBadge = (status: string) => {
     const statusLower = status?.toLowerCase() || 'save';
@@ -123,6 +131,7 @@ const InvoiceList = ({
                 <TableRow>
                   <TableHead>Invoice ID</TableHead>
                   <TableHead>Customer</TableHead>
+                  <TableHead>Shirt Sizes</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Issue Date</TableHead>
@@ -134,7 +143,7 @@ const InvoiceList = ({
               <TableBody>
                 {filteredInvoices.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-6">
+                    <TableCell colSpan={9} className="text-center text-muted-foreground py-6">
                       No invoices found.
                     </TableCell>
                   </TableRow>
@@ -143,11 +152,12 @@ const InvoiceList = ({
                     <TableRow key={invoice.id} className="hover:bg-muted/50">
                       <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
                       <TableCell>{invoice.customer}</TableCell>
+                      <TableCell>{invoice.shirtSizes}</TableCell>
                       <TableCell>₹{(invoice.amount || 0).toLocaleString()}</TableCell>
                       <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                       <TableCell>{invoice.date}</TableCell>
                       <TableCell className={invoice.status === "overdue" ? "text-destructive font-medium" : ""}>
-                        {invoice.dueDate || "-"}
+                        {invoice.dueDate}
                       </TableCell>
                       <TableCell>{invoice.paidDate}</TableCell>
                       <TableCell className="text-right">

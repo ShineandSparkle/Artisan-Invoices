@@ -417,7 +417,10 @@ export const useSupabaseData = () => {
         quotation_number: quotationNumber,
         user_id: user.id
       }])
-      .select()
+      .select(`
+        *,
+        customer:customer_id(*)
+      `)
       .single();
 
     if (!error && data) {
@@ -454,7 +457,10 @@ export const useSupabaseData = () => {
       .update(quotationData)
       .eq("id", quotationId)
       .eq("user_id", user.id)
-      .select()
+      .select(`
+        *,
+        customer:customer_id(*)
+      `)
       .single();
 
     if (!error && data) {

@@ -53,16 +53,24 @@ const QuotationList = ({
   const [searchTerm, setSearchTerm] = useState("");
   const { companySettings } = useSettings();
 
-  const displayQuotations = quotations.map(q => ({
-    id: q.id,
-    quotationNumber: q.quotation_number,
-    customer: q.customer?.name || 'Unknown Customer',
-    amount: q.amount,
-    status: q.status,
-    date: q.date,
-    validUntil: q.valid_until,
-    fullQuotation: q
-  }));
+  const displayQuotations = quotations.map(q => {
+    const shirtSizes = q.items
+      .map((item: any) => item.shirt_size)
+      .filter((size: string) => size)
+      .join(', ');
+    
+    return {
+      id: q.id,
+      quotationNumber: q.quotation_number,
+      customer: q.customer?.name || 'Unknown Customer',
+      amount: q.amount,
+      status: q.status,
+      date: q.date,
+      validUntil: q.valid_until,
+      shirtSizes: shirtSizes || '-',
+      fullQuotation: q
+    };
+  });
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
@@ -70,7 +78,8 @@ const QuotationList = ({
       sent: { variant: "outline", label: "Sent" },
       accepted: { variant: "default", label: "Accepted", className: "bg-success text-success-foreground" },
       rejected: { variant: "destructive", label: "Rejected" },
-      expired: { variant: "secondary", label: "Expired", className: "bg-muted text-muted-foreground" }
+      expired: { variant: "secondary", label: "Expired", className: "bg-muted text-muted-foreground" },
+      invoiced: { variant: "default", label: "Invoiced", className: "bg-primary text-primary-foreground" }
     };
     
     const config = variants[status] || variants.save;
@@ -117,6 +126,7 @@ const QuotationList = ({
                 <TableRow>
                   <TableHead>Quotation ID</TableHead>
                   <TableHead>Customer</TableHead>
+                  <TableHead>Shirt Sizes</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
@@ -129,6 +139,7 @@ const QuotationList = ({
                   <TableRow key={quotation.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium">{quotation.quotationNumber}</TableCell>
                     <TableCell>{quotation.customer}</TableCell>
+                    <TableCell>{quotation.shirtSizes}</TableCell>
                     <TableCell>₹{quotation.amount.toLocaleString()}</TableCell>
                     <TableCell>{getStatusBadge(quotation.status)}</TableCell>
                     <TableCell>{quotation.date}</TableCell>
@@ -162,10 +173,12 @@ const QuotationList = ({
                             <Printer className="mr-2 h-4 w-4" />
                             Print
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onQuotationToInvoice(quotation.id)}>
-                            <FileText className="mr-2 h-4 w-4" />
-                            Quotation to Invoice
-                          </DropdownMenuItem>
+                          {quotation.status !== "invoiced" && (
+                            <DropdownMenuItem onClick={() => onQuotationToInvoice(quotation.id)}>
+                              <FileText className="mr-2 h-4 w-4" />
+                              Quotation to Invoice
+                            </DropdownMenuItem>
+                          )}
                           {quotation.status === "save" && (
                             <DropdownMenuItem onClick={() => onSendToCustomer?.(quotation.id)}>
                               <Send className="mr-2 h-4 w-4" />

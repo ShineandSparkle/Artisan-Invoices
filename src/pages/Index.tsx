@@ -362,6 +362,16 @@ const Index = () => {
               const quotation = quotations.find(q => q.id === quotationId);
               if (!quotation) return;
 
+              // Check if quotation is already converted to invoice
+              if (quotation.status === "invoiced") {
+                toast({
+                  title: "Already Converted",
+                  description: "This quotation has already been converted to an invoice.",
+                  variant: "destructive"
+                });
+                return;
+              }
+
               const customer = customers.find(c => c.id === quotation.customer_id);
               if (!customer) {
                 toast({
@@ -388,11 +398,15 @@ const Index = () => {
                 invoice_date: new Date().toISOString().split('T')[0],
                 status: "Unpaid",
                 items: quotation.items,
-                notes: quotation.notes || ""
+                notes: quotation.notes || "",
+                tax_type: quotation.tax_type
               };
 
-              const newInvoice = await addInvoice(invoiceData);
+              const newInvoice = await addInvoice(invoiceData, invoiceSettings.prefix);
               if (newInvoice) {
+                // Update quotation status to "invoiced"
+                await updateQuotation(quotationId, { status: "invoiced" });
+                
                 toast({
                   title: "Invoice created",
                   description: `Invoice ${newInvoice.invoice_number} has been created from quotation ${quotation.quotation_number}.`
