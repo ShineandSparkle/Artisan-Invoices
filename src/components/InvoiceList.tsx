@@ -52,7 +52,7 @@ const InvoiceList = ({
   onSendToCustomer
 }: InvoiceListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { companySettings } = useSettings();
+  const { companySettings, invoiceSettings } = useSettings();
 
   const displayInvoices = invoices.map(i => {
     const shirtSizes = i.items
@@ -180,7 +180,7 @@ const InvoiceList = ({
                               const { generateInvoicePrintHTML } = await import('@/utils/printTemplate');
                               const printWindow = window.open('', '_blank');
                               if (printWindow) {
-                                const invoiceHtml = generateInvoicePrintHTML(invoice.fullInvoice, companySettings);
+                                const invoiceHtml = generateInvoicePrintHTML(invoice.fullInvoice, companySettings, invoiceSettings.termsAndConditions);
                                 printWindow.document.write(invoiceHtml);
                                 printWindow.document.close();
                                 printWindow.print();
@@ -248,34 +248,12 @@ const InvoiceList = ({
               ₹{filteredInvoices
                 .filter(i => {
                   const status = i.status?.toLowerCase();
-                  return status === "pending" || status === "sent";
+                  return status === "pending" || status === "sent" || status === "unpaid";
                 })
                 .reduce((sum, i) => sum + (i.amount || 0), 0)
                 .toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">Pending Amount</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-destructive">
-              ₹{filteredInvoices
-                .filter(i => i.status?.toLowerCase() === "overdue")
-                .reduce((sum, i) => sum + (i.amount || 0), 0)
-                .toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">Overdue Amount</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-muted-foreground">
-              {filteredInvoices.filter(i => {
-                const status = i.status?.toLowerCase();
-                return status === "save" || status === "draft";
-              }).length}
-            </div>
-            <p className="text-xs text-muted-foreground">Saved Drafts</p>
+            <p className="text-xs text-muted-foreground">Unpaid Amount</p>
           </CardContent>
         </Card>
       </div>

@@ -13,7 +13,7 @@ interface QuotationDetailsProps {
 }
 
 const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps) => {
-  const { companySettings } = useSettings();
+  const { companySettings, invoiceSettings } = useSettings();
   if (!quotation) return null;
 
   const subtotal = quotation.subtotal || 0;
@@ -36,7 +36,7 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
-      const quotationHtml = generateQuotationPrintHTML(quotation, companySettings);
+      const quotationHtml = generateQuotationPrintHTML(quotation, companySettings, invoiceSettings.termsAndConditions);
       printWindow.document.write(quotationHtml);
       printWindow.document.close();
       printWindow.print();

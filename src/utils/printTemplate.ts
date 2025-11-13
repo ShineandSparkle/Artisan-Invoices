@@ -70,7 +70,7 @@ const generateStyles = () => `
   </style>
 `;
 
-export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanySettings): string => {
+export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanySettings, termsAndConditions?: string): string => {
   const subtotal = invoice.subtotal || 0;
   const taxAmount = invoice.tax_amount || 0;
   const totalAmount = invoice.total_amount || invoice.amount || 0;
@@ -157,6 +157,8 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
 
     ${invoice.notes ? `<div class="amount-words"><strong>Notes:</strong> ${invoice.notes}</div>` : ''}
 
+    ${termsAndConditions ? `<div class="amount-words"><strong>Terms and Conditions:</strong> ${termsAndConditions}</div>` : ''}
+
     <div class="footer-section">
       <div class="bank-details">
         <h3>Company Bank Details</h3>
@@ -176,7 +178,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
   </html>`;
 };
 
-export const generateQuotationPrintHTML = (quotation: any, companySettings: CompanySettings): string => {
+export const generateQuotationPrintHTML = (quotation: any, companySettings: CompanySettings, termsAndConditions?: string): string => {
   const subtotal = quotation.subtotal || 0;
   const taxAmount = quotation.tax_amount || 0;
   const totalAmount = quotation.amount || 0;
@@ -260,6 +262,8 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
     <div class="amount-words"><strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only</div>
 
     ${quotation.notes ? `<div class="amount-words"><strong>Notes:</strong> ${quotation.notes}</div>` : ''}
+
+    ${termsAndConditions ? `<div class="amount-words"><strong>Terms and Conditions:</strong> ${termsAndConditions}</div>` : ''}
 
     <div class="footer-section">
       <div class="bank-details">

@@ -14,7 +14,7 @@ interface InvoiceDetailsProps {
 }
 
 const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
-  const { companySettings } = useSettings();
+  const { companySettings, invoiceSettings } = useSettings();
   if (!invoice) return null;
 
   const subtotal = invoice.subtotal || 0;
@@ -37,7 +37,7 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
-      const invoiceHtml = generateInvoicePrintHTML(invoice, companySettings);
+      const invoiceHtml = generateInvoicePrintHTML(invoice, companySettings, invoiceSettings.termsAndConditions);
       printWindow.document.write(invoiceHtml);
       printWindow.document.close();
       printWindow.print();

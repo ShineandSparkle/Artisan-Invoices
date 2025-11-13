@@ -34,7 +34,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
     validUntil: "",
     notes: "",
     taxType: "IGST_18",
-    status: "pending",
+    status: "sent",
     complimentary: false,
     taxMode: "exclusive"
   });
@@ -299,7 +299,6 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="sent">Sent</SelectItem>
                     <SelectItem value="accepted">Accepted</SelectItem>
                     <SelectItem value="rejected">Rejected</SelectItem>

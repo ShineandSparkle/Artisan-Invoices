@@ -24,6 +24,7 @@ export interface InvoiceSettings {
   defaultTerms: string;
   defaultNotes: string;
   currency: string;
+  termsAndConditions: string;
 }
 
 export interface NotificationSettings {
@@ -55,7 +56,8 @@ export const useSettings = () => {
     quotationPrefix: "QUO/2526/",
     defaultTerms: "Payment is due within 30 days of invoice date.",
     defaultNotes: "Thank you for your business!",
-    currency: "INR"
+    currency: "INR",
+    termsAndConditions: ""
   });
 
   const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({

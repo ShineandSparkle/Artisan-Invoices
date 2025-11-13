@@ -51,7 +51,7 @@ const QuotationList = ({
   onSendToCustomer
 }: QuotationListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { companySettings } = useSettings();
+  const { companySettings, invoiceSettings } = useSettings();
 
   const displayQuotations = quotations.map(q => {
     const shirtSizes = q.items
@@ -165,7 +165,7 @@ const QuotationList = ({
                             const { generateQuotationPrintHTML } = await import('@/utils/printTemplate');
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
-                              const quotationHtml = generateQuotationPrintHTML(quotation.fullQuotation, companySettings);
+                              const quotationHtml = generateQuotationPrintHTML(quotation.fullQuotation, companySettings, invoiceSettings.termsAndConditions);
                               printWindow.document.write(quotationHtml);
                               printWindow.document.close();
                               printWindow.print();

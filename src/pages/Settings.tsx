@@ -341,6 +341,17 @@ const Settings = () => {
             />
           </div>
 
+          <div>
+            <Label htmlFor="termsAndConditions">Terms and Conditions (Optional)</Label>
+            <Textarea
+              id="termsAndConditions"
+              value={invoiceSettings.termsAndConditions}
+              onChange={(e) => handleInvoiceChange("termsAndConditions", e.target.value)}
+              rows={4}
+              placeholder="Enter terms and conditions to be printed at the bottom of invoices and quotations"
+            />
+          </div>
+
           <Button onClick={handleSaveInvoice}>Save Invoice Settings</Button>
         </CardContent>
       </Card>

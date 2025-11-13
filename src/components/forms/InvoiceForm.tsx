@@ -313,12 +313,9 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
                     <SelectItem value="sent">Sent</SelectItem>
                     <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="unpaid">Unpaid</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
