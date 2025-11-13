@@ -130,98 +130,105 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
               <thead className="bg-muted">
                 <tr>
                   <th className="text-left p-3 border" style={{ width: '52%' }}>Particulars</th>
+                  <th className="text-center p-3 border" style={{ width: '12%' }}>Size</th>
                   <th className="text-center p-3 border" style={{ width: '12%' }}>QTY</th>
                   <th className="text-center p-3 border" style={{ width: '12%' }}>Units</th>
-                  <th className="text-right p-3 border" style={{ width: '12%' }}>RATE</th>
-                  <th className="text-right p-3 border" style={{ width: '12%' }}>Amount</th>
+                  <th className="text-center p-3 border" style={{ width: '12%' }}>Rate</th>
+                  <th className="text-center p-3 border" style={{ width: '12%' }}>Amount</th>
                 </tr>
               </thead>
               <tbody>
                 {quotation.items?.map((item: any, index: number) => (
                   <tr key={index}>
-                    <td className="p-3 border">{item.description}{item.shirt_size ? ' - ' + item.shirt_size : ''}</td>
+                    <td className="p-3 border">{item.description}</td>
+                    <td className="text-center p-3 border">{item.shirt_size ? + item.shirt_size : ''}</td>
                     <td className="text-center p-3 border">{item.quantity}</td>
                     <td className="text-center p-3 border">{item.unit || 'Pcs'}</td>
-                    <td className="text-right p-3 border">₹{item.rate?.toFixed(2)}</td>
-                    <td className="text-right p-3 border">₹{item.amount?.toFixed(2)}</td>
+                    <td className="text-center p-3 border">₹{item.rate?.toFixed(2)}</td>
+                    <td className="text-center p-3 border">₹{item.amount?.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {/* Totals */}
-          <div className="border rounded-lg overflow-hidden">
-            <table className="w-full">
-              <tbody>
-                <tr>
-                  <td colSpan={4} className="text-right p-3 border font-semibold">Total:</td>
-                  <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
-                </tr>
-                <tr>
-                  <td colSpan={4} className="text-right p-3 border">Discount:</td>
-                  <td className="text-right p-3 border">₹0.00</td>
-                </tr>
-                <tr>
-                  <td colSpan={4} className="text-right p-3 border font-semibold">Taxable Value:</td>
-                  <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
-                </tr>
-                {isIGST ? (
-                  <tr>
-                    <td colSpan={5} className="text-right p-3 border">ADD IGST {fullTaxRate}%:</td>
-                    <td className="text-right p-3 border">₹{taxAmount.toFixed(2)}</td>
-                  </tr>
-                ) : (
-                  <>
-                    <tr>
-                      <td colSpan={5} className="text-right p-3 border">ADD CGST {halfTaxRate}%:</td>
-                      <td className="text-right p-3 border">₹{cgstAmount.toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                      <td colSpan={5} className="text-right p-3 border">ADD SGST {halfTaxRate}%:</td>
-                      <td className="text-right p-3 border">₹{sgstAmount.toFixed(2)}</td>
-                    </tr>
-                  </>
-                )}
-                <tr>
-                  <td colSpan={5} className="text-right p-3 border font-bold text-lg">Total:</td>
-                  <td className="text-right p-3 border font-bold text-lg">₹{totalAmount.toFixed(2)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <div className="flex flex-col md:flex-row gap-4 w-full">
+            {/* Bank Details - Left */}
+            <div className="flex-1">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Company's Bank Details</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="font-semibold">Holder A/c Name:</div>
+                    <div>{companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</div>
 
-          {/* Bank Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Company's Bank Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="font-semibold">Holder A/c Name:</div>
-                <div>{companySettings.accountHolderName || companySettings.name || 'ARTISAN APPARELS'}</div>
-                <div className="font-semibold">BANK NAME:</div>
-                <div>{companySettings.bankName || 'HDFC BANK'}</div>
-                <div className="font-semibold">ACCOUNT No:</div>
-                <div>{companySettings.accountNumber || '9998019993333'}</div>
-                <div className="font-semibold">BRANCH:</div>
-                <div>{companySettings.branchAddress || 'ADONI'}</div>
-                <div className="font-semibold">IFSC CODE:</div>
-                <div>{companySettings.routingNumber || 'HDFC0001933'}</div>
+                    <div className="font-semibold">BANK NAME:</div>
+                    <div>{companySettings.bankName || 'HDFC BANK'}</div>
+
+                    <div className="font-semibold">ACCOUNT No:</div>
+                    <div>{companySettings.accountNumber || '9998019993333'}</div>
+
+                    <div className="font-semibold">BRANCH:</div>
+                    <div>{companySettings.branchAddress || 'ADONI'}</div>
+
+                    <div className="font-semibold">IFSC CODE:</div>
+                    <div>{companySettings.routingNumber || 'HDFC0001933'}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Totals - Right */}
+            <div className="flex-1 flex justify-end">
+              <div className="border rounded-lg overflow-hidden w-full max-w-xs">
+                <table className="w-full border-collapse">
+                  <tbody>
+                    <tr>
+                      <td className="text-right p-3 border font-semibold">Total:</td>
+                      <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td className="text-right p-3 border">Discount:</td>
+                      <td className="text-right p-3 border">₹0.00</td>
+                    </tr>
+                    <tr>
+                      <td className="text-right p-3 border font-semibold">Taxable Value:</td>
+                      <td className="text-right p-3 border font-semibold">₹{subtotal.toFixed(2)}</td>
+                    </tr>
+                    {isIGST ? (
+                      <tr>
+                        <td className="text-right p-3 border">ADD IGST {fullTaxRate}%:</td>
+                        <td className="text-right p-3 border">₹{taxAmount.toFixed(2)}</td>
+                      </tr>
+                    ) : (
+                      <>
+                        <tr>
+                          <td className="text-right p-3 border">ADD CGST {halfTaxRate}%:</td>
+                          <td className="text-right p-3 border">₹{cgstAmount.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                          <td className="text-right p-3 border">ADD SGST {halfTaxRate}%:</td>
+                          <td className="text-right p-3 border">₹{sgstAmount.toFixed(2)}</td>
+                        </tr>
+                      </>
+                    )}
+                    <tr>
+                      <td className="text-right p-3 border font-bold text-lg">Total:</td>
+                      <td className="text-right p-3 border font-bold text-lg">₹{totalAmount.toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-            </CardContent>
-          </Card>
-
+            </div>
+          </div>         
           {/* Notes */}
           {quotation.notes && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Notes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm whitespace-pre-wrap">{quotation.notes}</p>
-              </CardContent>
-            </Card>
+            <div className="bg-white border rounded-lg p-3 w-full flex flex-wrap items-start gap-2 shadow-sm">
+              <span className="font-semibold">Notes:</span>
+              <span className="text-sm whitespace-pre-wrap">{quotation.notes}</span>
+            </div>
           )}
         </div>
       </DialogContent>
