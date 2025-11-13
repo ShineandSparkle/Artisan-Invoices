@@ -29,6 +29,12 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
     .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
 
   const totalInvoiced = invoices.reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
+  
+  const totalUnpaid = invoices
+    .filter(i => i.status === "unpaid" || i.status === "sent")
+    .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
+  
+  const activeQuotations = quotations.filter(q => q.status === "invoiced").length;
 
   const stats = [
     {
@@ -39,11 +45,25 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
       color: "text-success"
     },
     {
+      title: "Active Quotation",
+      value: activeQuotations.toString(),
+      change: `${activeQuotations}`,
+      icon: FileText,
+      color: "text-primary"
+    },
+    {
       title: "Invoiced",
       value: `₹${totalInvoiced.toLocaleString()}`,
       change: "+8",
       icon: Receipt,
       color: "text-primary"
+    },
+    {
+      title: "Unpaid",
+      value: `₹${totalUnpaid.toLocaleString()}`,
+      change: "+3",
+      icon: Clock,
+      color: "text-destructive"
     },
     {
       title: "Total Customers",
@@ -95,7 +115,7 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         {stats.map((stat, index) => (
           <Card key={index} className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

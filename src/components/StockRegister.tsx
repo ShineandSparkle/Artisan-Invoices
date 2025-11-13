@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Trash2, Edit, Eye, Plus } from "lucide-react";
+import { Trash2, Edit, Eye, Plus, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSupabaseData } from "@/hooks/useSupabaseData";
 
@@ -242,9 +242,52 @@ const StockRegister = () => {
     setProducts(updatedProducts);
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <style>{`
+        @media print {
+          @page {
+            size: landscape;
+            margin: 0.5cm;
+          }
+          body * {
+            visibility: hidden;
+          }
+          #stock-register-print, #stock-register-print * {
+            visibility: visible;
+          }
+          #stock-register-print {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+          .no-print {
+            display: none !important;
+          }
+          #stock-register-print table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+          }
+          #stock-register-print th,
+          #stock-register-print td {
+            border: 2px solid #000;
+            padding: 4px;
+          }
+          #stock-register-print tr {
+            border: 3px solid #000;
+          }
+          #stock-register-print thead tr {
+            background-color: #f0f0f0;
+          }
+        }
+      `}</style>
+      <div className="flex justify-between items-center no-print">
         <div className="flex gap-4">
           <div className="flex items-center gap-2">
             <Label htmlFor="month-select">Month:</Label>
@@ -279,9 +322,15 @@ const StockRegister = () => {
         </div>
       </div>
 
-      <Card className="w-full">
+      <Card className="w-full" id="stock-register-print">
         <CardHeader>
-          <CardTitle className="text-2xl">Stock Register - {MONTHS.find(m => m.value === selectedMonth)?.label} {selectedYear}</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-2xl">Stock Register - {MONTHS.find(m => m.value === selectedMonth)?.label} {selectedYear}</CardTitle>
+            <Button onClick={handlePrint} variant="outline" size="sm" className="no-print">
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-6">
           <div className="overflow-x-auto">
@@ -292,7 +341,7 @@ const StockRegister = () => {
                   {SIZES.map(size => (
                     <th key={size} className="text-center p-4 font-semibold text-lg min-w-[140px]">Size {size}</th>
                   ))}
-                  <th className="text-center p-4 font-semibold text-lg min-w-[120px]">Actions</th>
+                  <th className="text-center p-4 font-semibold text-lg min-w-[120px] no-print">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -314,7 +363,7 @@ const StockRegister = () => {
                         </td>
                       );
                     })}
-                    <td className="p-4">
+                    <td className="p-4 no-print">
                       <div className="flex justify-center space-x-2">
                         <Button
                           variant="outline"
