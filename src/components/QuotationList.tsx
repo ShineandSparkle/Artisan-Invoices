@@ -208,7 +208,7 @@ const QuotationList = ({
       </Card>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold">{filteredQuotations.length}</div>
@@ -229,17 +229,12 @@ const QuotationList = ({
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-primary">
-              {filteredQuotations.filter(q => q.status === "sent").length}
+              ₹{filteredQuotations
+                .filter(q => q.status === "invoiced")
+                .reduce((sum, q) => sum + q.amount, 0)
+                .toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">Pending Response</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-muted-foreground">
-              {filteredQuotations.filter(q => q.status === "pending").length}
-            </div>
-            <p className="text-xs text-muted-foreground">Pending</p>
+            <p className="text-xs text-muted-foreground">Invoiced</p>
           </CardContent>
         </Card>
       </div>
