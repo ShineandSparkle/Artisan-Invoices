@@ -224,7 +224,7 @@ const InvoiceList = ({
       </Card>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold">{filteredInvoices.length}</div>
@@ -248,7 +248,7 @@ const InvoiceList = ({
               ₹{filteredInvoices
                 .filter(i => {
                   const status = i.status?.toLowerCase();
-                  return status === "pending" || status === "sent" || status === "unpaid";
+                  return status === "sent" || status === "unpaid";
                 })
                 .reduce((sum, i) => sum + (i.amount || 0), 0)
                 .toLocaleString()}
