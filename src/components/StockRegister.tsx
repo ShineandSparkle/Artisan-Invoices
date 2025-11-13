@@ -324,9 +324,13 @@ const StockRegister = () => {
 
       <Card className="w-full" id="stock-register-print">
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl">Stock Register - {MONTHS.find(m => m.value === selectedMonth)?.label} {selectedYear}</CardTitle>
-            <Button onClick={handlePrint} variant="outline" size="sm" className="no-print">
+          <div className="flex items-center justify-between relative">
+            {/* Centered title */}
+            <CardTitle className="absolute left-1/2 transform -translate-x-1/2 text-2xl">
+              Stock Register - {MONTHS.find(m => m.value === selectedMonth)?.label} {selectedYear}
+            </CardTitle>
+            {/* Print button on the right */}
+            <Button onClick={handlePrint} variant="outline" size="sm" className="no-print ml-auto">
               <Printer className="h-4 w-4 mr-2" />
               Print
             </Button>
