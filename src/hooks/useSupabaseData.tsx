@@ -147,6 +147,150 @@ export const useSupabaseData = () => {
     fetchData();
   }, [user]);
 
+  // Realtime subscription for customers
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('customers-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'customers'
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setCustomers(prev => [payload.new as Customer, ...prev]);
+          } else if (payload.eventType === 'UPDATE') {
+            setCustomers(prev => 
+              prev.map(c => c.id === payload.new.id ? payload.new as Customer : c)
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setCustomers(prev => prev.filter(c => c.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  // Realtime subscription for invoices
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('invoices-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'invoices'
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newInvoice = {
+              ...payload.new,
+              items: Array.isArray(payload.new.items) ? payload.new.items : []
+            } as Invoice;
+            setInvoices(prev => [newInvoice, ...prev]);
+          } else if (payload.eventType === 'UPDATE') {
+            setInvoices(prev => 
+              prev.map(i => i.id === payload.new.id ? {
+                ...payload.new,
+                items: Array.isArray(payload.new.items) ? payload.new.items : []
+              } as Invoice : i)
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setInvoices(prev => prev.filter(i => i.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  // Realtime subscription for quotations
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('quotations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'quotations'
+        },
+        async (payload) => {
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            // Fetch the quotation with customer data
+            const { data } = await supabase
+              .from('quotations')
+              .select('*, customer:customer_id(*)')
+              .eq('id', payload.new.id)
+              .single();
+
+            if (data) {
+              const quotation = {
+                ...data,
+                items: Array.isArray(data.items) ? data.items : []
+              } as Quotation;
+
+              if (payload.eventType === 'INSERT') {
+                setQuotations(prev => [quotation, ...prev]);
+              } else {
+                setQuotations(prev => 
+                  prev.map(q => q.id === data.id ? quotation : q)
+                );
+              }
+            }
+          } else if (payload.eventType === 'DELETE') {
+            setQuotations(prev => prev.filter(q => q.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  // Realtime subscription for stock_register
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('stock-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'stock_register'
+        },
+        () => {
+          // Refresh all data when stock changes to ensure consistency
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const addCustomer = async (customerData: Omit<Customer, "id" | "created_at" | "updated_at">) => {
     if (!user) {
       toast({
