@@ -269,6 +269,13 @@ const StockRegister = () => {
           .no-print {
             display: none !important;
           }
+          .print-title {
+            display: block !important;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+          }
           #stock-register-print table {
             width: 100%;
             border-collapse: collapse;
@@ -286,10 +293,16 @@ const StockRegister = () => {
             background-color: #f0f0f0;
           }
         }
+        .print-title {
+          display: none;
+        }
       `}</style>
       
       <Card className="w-full" id="stock-register-print">
         <CardHeader>
+          <div className="print-title">
+            Stock Register - {MONTHS.find(m => m.value === selectedMonth)?.label} {selectedYear}
+          </div>
           <div className="flex items-center justify-between gap-4 no-print">
             <div className="flex gap-4">
               <div className="flex items-center gap-2">
