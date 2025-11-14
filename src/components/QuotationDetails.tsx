@@ -36,7 +36,7 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
-      const quotationHtml = generateQuotationPrintHTML(quotation, companySettings, invoiceSettings.termsAndConditions);
+      const quotationHtml = generateQuotationPrintHTML(quotation, companySettings, invoiceSettings.termsAndConditions, invoiceSettings.defaultNotes);
       printWindow.document.write(quotationHtml);
       printWindow.document.close();
       printWindow.print();

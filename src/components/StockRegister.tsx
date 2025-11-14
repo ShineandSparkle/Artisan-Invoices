@@ -287,50 +287,46 @@ const StockRegister = () => {
           }
         }
       `}</style>
-      <div className="flex justify-between items-center no-print">
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="month-select">Month:</Label>
-            <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {MONTHS.map(month => (
-                  <SelectItem key={month.value} value={month.value.toString()}>
-                    {month.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2">
-            <Label htmlFor="year-select">Year:</Label>
-            <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-              <SelectTrigger className="w-24">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[2023, 2024, 2025, 2026, 2027].map(year => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
+      
       <Card className="w-full" id="stock-register-print">
         <CardHeader>
-          <div className="flex items-center justify-between relative">
-            {/* Centered title */}
-            <CardTitle className="absolute left-1/2 transform -translate-x-1/2 text-2xl">
+          <div className="flex items-center justify-between gap-4 no-print">
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="month-select">Month:</Label>
+                <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MONTHS.map((month) => (
+                      <SelectItem key={month.value} value={month.value.toString()}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="year-select">Year:</Label>
+                <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[2023, 2024, 2025, 2026, 2027].map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-center flex-1">
               Stock Register - {MONTHS.find(m => m.value === selectedMonth)?.label} {selectedYear}
             </CardTitle>
-            {/* Print button on the right */}
-            <Button onClick={handlePrint} variant="outline" size="sm" className="no-print ml-auto">
+            <Button onClick={handlePrint} variant="outline" size="sm">
               <Printer className="h-4 w-4 mr-2" />
               Print
             </Button>

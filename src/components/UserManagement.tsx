@@ -1,0 +1,128 @@
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Users } from "lucide-react";
+
+export const UserManagement = () => {
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<'admin' | 'user'>('user');
+  const [loading, setLoading] = useState(false);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Validation Error",
+        description: "Email and password are required.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Create user via Supabase admin API (requires service role)
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (signUpData.user) {
+        // Add role to user_roles table
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: signUpData.user.id,
+            role: role
+          });
+
+        if (roleError) throw roleError;
+
+        toast({
+          title: "User Created",
+          description: `User ${email} created successfully with ${role} role.`
+        });
+
+        // Reset form
+        setEmail("");
+        setPassword("");
+        setRole('user');
+      }
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create user.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Users className="mr-2 h-5 w-5" />
+          User Management
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleCreateUser} className="space-y-4">
+          <div>
+            <Label htmlFor="userEmail">Email</Label>
+            <Input
+              id="userEmail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="user@example.com"
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="userPassword">Password</Label>
+            <Input
+              id="userPassword"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+              minLength={6}
+            />
+          </div>
+          <div>
+            <Label htmlFor="userRole">Role</Label>
+            <Select value={role} onValueChange={(value: 'admin' | 'user') => setRole(value)}>
+              <SelectTrigger id="userRole">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="user">User</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Creating..." : "Create User"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+};
