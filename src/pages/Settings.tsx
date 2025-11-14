@@ -6,11 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Upload, Settings as SettingsIcon, Building, Bell, Trash2 } from "lucide-react";
 import { useSupabaseData } from "@/hooks/useSupabaseData";
+import { UserManagement } from "@/components/UserManagement";
 
 const Settings = () => {
   const { toast } = useToast();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const {
     companySettings,
     invoiceSettings,
@@ -25,6 +28,14 @@ const Settings = () => {
   } = useSettings();
   
   const { customers, invoices, deleteCustomer, deleteInvoice } = useSupabaseData();
+
+  if (loading || roleLoading) {
+    return <div className="p-6">Loading settings...</div>;
+  }
+
+  if (!isAdmin) {
+    return <div className="p-6">You do not have permission to access this page.</div>;
+  }
 
   const handleCompanyChange = (field: string, value: string) => {
     setCompanySettings(prev => ({ ...prev, [field]: value }));
@@ -68,10 +79,19 @@ const Settings = () => {
   const handleFaviconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      toast({
-        title: "Favicon Uploaded",
-        description: "Your favicon has been uploaded and will be applied."
-      });
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const faviconData = e.target?.result as string;
+        // Save favicon to company settings
+        const updatedSettings = { ...companySettings, favicon: faviconData };
+        setCompanySettings(updatedSettings);
+        await saveCompanySettings(updatedSettings);
+        toast({
+          title: "Favicon Uploaded",
+          description: "Your favicon has been saved to settings."
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -105,8 +125,12 @@ const Settings = () => {
     }
   };
 
-  if (loading) {
+  if (loading || roleLoading) {
     return <div className="p-6">Loading settings...</div>;
+  }
+
+  if (!isAdmin) {
+    return <div className="p-6">You do not have permission to access this page.</div>;
   }
 
   return (
@@ -115,6 +139,9 @@ const Settings = () => {
         <SettingsIcon className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Settings</h1>
       </div>
+
+      {/* User Management - Admin Only */}
+      <UserManagement />
 
       {/* Company Information */}
       <Card>
@@ -322,22 +349,13 @@ const Settings = () => {
           </div>
 
           <div>
-            <Label htmlFor="defaultTerms">Default Payment Terms</Label>
-            <Textarea
-              id="defaultTerms"
-              value={invoiceSettings.defaultTerms}
-              onChange={(e) => handleInvoiceChange("defaultTerms", e.target.value)}
-              rows={3}
-            />
-          </div>
-
-          <div>
             <Label htmlFor="defaultNotes">Default Notes</Label>
             <Textarea
               id="defaultNotes"
               value={invoiceSettings.defaultNotes}
               onChange={(e) => handleInvoiceChange("defaultNotes", e.target.value)}
               rows={2}
+              placeholder="These notes will be printed at the bottom of quotations and invoices"
             />
           </div>
 

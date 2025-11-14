@@ -178,7 +178,7 @@ export const generateInvoicePrintHTML = (invoice: any, companySettings: CompanyS
   </html>`;
 };
 
-export const generateQuotationPrintHTML = (quotation: any, companySettings: CompanySettings, termsAndConditions?: string): string => {
+export const generateQuotationPrintHTML = (quotation: any, companySettings: CompanySettings, termsAndConditions?: string, defaultNotes?: string): string => {
   const subtotal = quotation.subtotal || 0;
   const taxAmount = quotation.tax_amount || 0;
   const totalAmount = quotation.amount || 0;
@@ -262,6 +262,8 @@ export const generateQuotationPrintHTML = (quotation: any, companySettings: Comp
     <div class="amount-words"><strong>Amount Chargeable (in words):</strong> ${amountInWords} Rupees Only</div>
 
     ${quotation.notes ? `<div class="amount-words"><strong>Notes:</strong> ${quotation.notes}</div>` : ''}
+
+    ${defaultNotes ? `<div class="amount-words"><strong>Default Notes:</strong> ${defaultNotes}</div>` : ''}
 
     ${termsAndConditions ? `<div class="amount-words"><strong>Terms and Conditions:</strong> ${termsAndConditions}</div>` : ''}
 

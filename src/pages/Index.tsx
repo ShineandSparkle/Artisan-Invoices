@@ -382,10 +382,10 @@ const Index = () => {
                 return;
               }
 
-              // Calculate due date (30 days from invoice date)
+              // Calculate due date (10 days from invoice date)
               const invoiceDate = new Date();
               const dueDate = new Date(invoiceDate);
-              dueDate.setDate(dueDate.getDate() + 30);
+              dueDate.setDate(dueDate.getDate() + 10);
 
               const invoiceData = {
                 customer_name: customer.name,

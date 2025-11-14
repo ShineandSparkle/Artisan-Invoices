@@ -10,6 +10,7 @@ export interface CompanySettings {
   website: string;
   taxNumber: string;
   logo: string;
+  favicon?: string;
   bankName?: string;
   accountNumber?: string;
   routingNumber?: string;

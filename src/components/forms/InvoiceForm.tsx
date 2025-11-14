@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useStockCheck } from "@/hooks/useStockCheck";
 
 interface InvoiceFormProps {
   customers: any[];
@@ -46,6 +47,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<string[]>([]);
   const { toast } = useToast();
+  const { getAvailableStock, isStockAvailable } = useStockCheck();
 
   // Fetch unique products from stock register
   useEffect(() => {
@@ -206,6 +208,26 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
 
   const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
     const newItems = [...items];
+    
+    // Check stock availability when product or size changes
+    if ((field === 'description' || field === 'shirt_size') && value) {
+      const item = newItems[index];
+      const productName = field === 'description' ? value : item.description;
+      const size = field === 'shirt_size' ? value : item.shirt_size;
+      
+      if (productName && productName !== "__custom__" && size) {
+        const availableStock = getAvailableStock(String(productName), String(size));
+        if (availableStock === 0) {
+          toast({
+            title: "Stock Unavailable",
+            description: `${productName} (Size ${size}) is out of stock.`,
+            variant: "destructive"
+          });
+          return; // Don't allow selection
+        }
+      }
+    }
+    
     newItems[index] = { ...newItems[index], [field]: value };
     
     if (field === 'quantity' || field === 'rate') {
