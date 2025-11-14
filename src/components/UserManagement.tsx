@@ -38,14 +38,18 @@ export const UserManagement = () => {
 
       // Call edge function to create user
       const { data, error } = await supabase.functions.invoke('create-user', {
-        body: { email, password, role },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
+        body: { email, password, role }
       });
 
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
+      // Handle edge function errors
+      if (error) {
+        throw new Error(error.message || 'Failed to create user');
+      }
+
+      // Handle application-level errors from the function
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast({
         title: "User Created",
