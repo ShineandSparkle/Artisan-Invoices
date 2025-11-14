@@ -29,38 +29,33 @@ export const UserManagement = () => {
 
     setLoading(true);
     try {
-      // Create user via Supabase admin API (requires service role)
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('You must be logged in to create users');
+      }
+
+      // Call edge function to create user
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: { email, password, role },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
 
-      if (signUpData.user) {
-        // Add role to user_roles table
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: signUpData.user.id,
-            role: role
-          });
+      toast({
+        title: "User Created",
+        description: `User ${email} created successfully with ${role} role.`
+      });
 
-        if (roleError) throw roleError;
-
-        toast({
-          title: "User Created",
-          description: `User ${email} created successfully with ${role} role.`
-        });
-
-        // Reset form
-        setEmail("");
-        setPassword("");
-        setRole('user');
-      }
+      // Reset form
+      setEmail("");
+      setPassword("");
+      setRole('user');
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
