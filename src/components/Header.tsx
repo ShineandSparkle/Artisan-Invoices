@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { PlusCircle, User, Settings } from "lucide-react";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const Header = () => {
+  const { isAdmin } = useUserRole();
+  
   return (
     <header className="border-b border-border bg-card">
       <div className="container mx-auto px-6 py-4">
@@ -28,9 +31,11 @@ const Header = () => {
               New Invoice
             </Button>
             
-            <Button variant="ghost" size="icon">
-              <Settings className="h-4 w-4" />
-            </Button>
+            {isAdmin && (
+              <Button variant="ghost" size="icon">
+                <Settings className="h-4 w-4" />
+              </Button>
+            )}
             
             <Button variant="ghost" size="icon">
               <User className="h-4 w-4" />
