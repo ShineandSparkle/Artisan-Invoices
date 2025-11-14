@@ -1,8 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Users, FileText, Calculator, Download, Settings } from "lucide-react";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const QuickActions = () => {
+  const { isAdmin } = useUserRole();
+  
   const actions = [
     {
       title: "Create Invoice",
@@ -39,8 +42,12 @@ const QuickActions = () => {
       description: "Configure your account",
       icon: Settings,
       color: "bg-card hover:bg-accent text-card-foreground border border-border",
+      adminOnly: true,
     },
   ];
+
+  // Filter actions based on role
+  const visibleActions = actions.filter(action => !action.adminOnly || isAdmin);
 
   return (
     <Card>
@@ -49,7 +56,7 @@ const QuickActions = () => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {actions.map((action, index) => {
+          {visibleActions.map((action, index) => {
             const Icon = action.icon;
             return (
               <Button

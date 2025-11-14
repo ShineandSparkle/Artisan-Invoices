@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,15 +27,19 @@ const HEADER_HEIGHT = 72; // Increased for navigation
 const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { signOut } = useAuth();
+  const { isAdmin } = useUserRole();
 
-  const navigation = [
+  const allNavigation = [
     { name: "Dashboard", icon: BarChart3, key: "dashboard" },
     { name: "Quotations", icon: FileText, key: "quotations" },
     { name: "Invoices", icon: Receipt, key: "invoices" },
     { name: "Customers", icon: Users, key: "customers" },
     { name: "Stock Register", icon: Package, key: "stock-register" },
-    { name: "Settings", icon: Settings, key: "settings" },
+    { name: "Settings", icon: Settings, key: "settings", adminOnly: true },
   ];
+
+  // Filter navigation based on role
+  const navigation = allNavigation.filter(item => !item.adminOnly || isAdmin);
 
   const handleLogout = async () => {
     await signOut();
