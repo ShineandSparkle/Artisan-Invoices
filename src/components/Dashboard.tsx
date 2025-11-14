@@ -36,7 +36,7 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
     .filter(i => i.status === "unpaid" || i.status === "sent")
     .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
   
-  const activeQuotations = quotations.filter(q => q.status === "invoiced").length;
+  const activeQuotations = quotations.filter(q => q.status !== "invoiced" && q.status !== "rejected").length;
 
   const stats = [
     {
