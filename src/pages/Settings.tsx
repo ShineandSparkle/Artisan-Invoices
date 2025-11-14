@@ -10,6 +10,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Upload, Settings as SettingsIcon, Building, Bell, Trash2 } from "lucide-react";
 import { useSupabaseData } from "@/hooks/useSupabaseData";
 import { UserManagement } from "@/components/UserManagement";
+import { UserList } from "@/components/UserList";
 
 const Settings = () => {
   const { toast } = useToast();
@@ -142,6 +143,9 @@ const Settings = () => {
 
       {/* User Management - Admin Only */}
       <UserManagement />
+
+      {/* User List - Admin Only */}
+      <UserList />
 
       {/* Company Information */}
       <Card>
