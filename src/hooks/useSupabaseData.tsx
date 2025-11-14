@@ -98,14 +98,12 @@ export const useSupabaseData = () => {
       const { data: customersData } = await supabase
         .from("customers")
         .select("*")
-        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       // Fetch invoices
       const { data: invoicesData } = await supabase
         .from("invoices")
         .select("*")
-        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       // Fetch quotations with customer data
@@ -115,14 +113,12 @@ export const useSupabaseData = () => {
           *,
           customer:customer_id(*)
         `)
-        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       // Fetch payments
       const { data: paymentsData } = await supabase
         .from("payments")
         .select("*")
-        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       setCustomers(customersData || []);
@@ -193,10 +189,9 @@ export const useSupabaseData = () => {
     }
 
     // Generate invoice number
-    const { count } = await supabase
-      .from("invoices")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
+      const { count } = await supabase
+        .from("invoices")
+        .select("*", { count: "exact", head: true });
 
     const invoiceNumber = `${invoicePrefix}${String((count || 0) + 1).padStart(3, '0')}`;
 
@@ -226,10 +221,9 @@ export const useSupabaseData = () => {
         const invoiceItem = item as any;
         if (invoiceItem.description && invoiceItem.shirt_size && invoiceItem.quantity) {
           // Fetch existing stock entry
-          const { data: existingStock } = await supabase
+      const { data: existingStock } = await supabase
             .from("stock_register")
             .select("*")
-            .eq("user_id", user.id)
             .eq("product_name", invoiceItem.description)
             .eq("size", invoiceItem.shirt_size)
             .eq("month", month)
@@ -290,13 +284,12 @@ export const useSupabaseData = () => {
       return null;
     }
 
-    const { data, error } = await supabase
-      .from("invoices")
-      .update(invoiceData)
-      .eq("id", invoiceId)
-      .eq("user_id", user.id)
-      .select()
-      .single();
+      const { data, error } = await supabase
+        .from("invoices")
+        .update(invoiceData)
+        .eq("id", invoiceId)
+        .select()
+        .single();
 
     if (!error && data) {
       const processedData = {
@@ -327,11 +320,10 @@ export const useSupabaseData = () => {
       return false;
     }
 
-    const { error } = await supabase
-      .from("invoices")
-      .delete()
-      .eq("id", invoiceId)
-      .eq("user_id", user.id);
+      const { error } = await supabase
+        .from("invoices")
+        .delete()
+        .eq("id", invoiceId);
 
     if (!error) {
       setInvoices(prev => prev.filter(i => i.id !== invoiceId));
@@ -362,7 +354,6 @@ export const useSupabaseData = () => {
       .from("customers")
       .update(customerData)
       .eq("id", customerId)
-      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -394,8 +385,7 @@ export const useSupabaseData = () => {
     const { error } = await supabase
       .from("customers")
       .delete()
-      .eq("id", customerId)
-      .eq("user_id", user.id);
+      .eq("id", customerId);
 
     if (!error) {
       setCustomers(prev => prev.filter(c => c.id !== customerId));
@@ -454,10 +444,9 @@ export const useSupabaseData = () => {
     }
 
     // Generate quotation number with prefix from settings
-    const { count } = await supabase
-      .from("quotations")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
+      const { count } = await supabase
+        .from("quotations")
+        .select("*", { count: "exact", head: true });
 
     const prefix = quotationPrefix || "QUO/2526/";
     const quotationNumber = `${prefix}${String((count || 0) + 1).padStart(3, '0')}`;
@@ -504,16 +493,15 @@ export const useSupabaseData = () => {
       return null;
     }
 
-    const { data, error } = await supabase
-      .from("quotations")
-      .update(quotationData)
-      .eq("id", quotationId)
-      .eq("user_id", user.id)
-      .select(`
-        *,
-        customer:customer_id(*)
-      `)
-      .single();
+      const { data, error } = await supabase
+        .from("quotations")
+        .update(quotationData)
+        .eq("id", quotationId)
+        .select(`
+          *,
+          customer:customer_id(*)
+        `)
+        .single();
 
     if (!error && data) {
       const processedData = {
@@ -544,11 +532,10 @@ export const useSupabaseData = () => {
       return false;
     }
 
-    const { error } = await supabase
-      .from("quotations")
-      .delete()
-      .eq("id", quotationId)
-      .eq("user_id", user.id);
+      const { error } = await supabase
+        .from("quotations")
+        .delete()
+        .eq("id", quotationId);
 
     if (!error) {
       setQuotations(prev => prev.filter(q => q.id !== quotationId));
@@ -605,7 +592,6 @@ export const useSupabaseData = () => {
       .from("stock_register")
       .update(stockData)
       .eq("id", stockId)
-      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -625,7 +611,6 @@ export const useSupabaseData = () => {
     const { data, error } = await supabase
       .from("stock_register")
       .select("*")
-      .eq("user_id", user.id)
       .eq("month", month)
       .eq("year", year);
 
@@ -653,8 +638,7 @@ export const useSupabaseData = () => {
     const { error } = await supabase
       .from("stock_register")
       .delete()
-      .eq("id", stockId)
-      .eq("user_id", user.id);
+      .eq("id", stockId);
 
     if (error) {
       toast({
