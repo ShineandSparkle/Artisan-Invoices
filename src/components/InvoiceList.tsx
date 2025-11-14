@@ -189,7 +189,7 @@ const InvoiceList = ({
                               <Receipt className="mr-2 h-4 w-4" />
                               Print
                             </DropdownMenuItem>
-                            {(invoice.status === "save" || invoice.status === "pending") && (
+                            {(invoice.status === "unpaid" || invoice.status === "sent") && (
                               <DropdownMenuItem onClick={() => onSendReminder?.(invoice.id)}>
                                 <Send className="mr-2 h-4 w-4" />
                                 Send Reminder

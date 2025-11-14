@@ -14,6 +14,7 @@ import QuotationDetails from "@/components/QuotationDetails";
 import { useSupabaseData } from "@/hooks/useSupabaseData";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -184,11 +185,26 @@ const Index = () => {
     }
   };
 
-  const handleSendReminder = (invoiceId: string) => {
-    toast({
-      title: "Reminder sent",
-      description: "Payment reminder has been sent to the customer."
-    });
+  const handleSendReminder = async (invoiceId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("send-invoice-reminder", {
+        body: { invoiceId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Reminder sent",
+        description: "Payment reminder has been sent to the customer."
+      });
+    } catch (error) {
+      console.error("Error sending reminder:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send reminder. Please check if customer email is set.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleViewQuotation = (id: string) => {
