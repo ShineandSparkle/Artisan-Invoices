@@ -13,8 +13,8 @@ Deno.serve(async (req) => {
       {
         auth: {
           autoRefreshToken: false,
-          persistSession: false
-        }
+          persistSession: false,
+        },
       }
     )
 
@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
 
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
-    
+
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
@@ -37,58 +37,56 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Check if requesting user is admin
-    const { data: roleData, error: roleError } = await supabaseAdmin
+    // Ensure requester is admin
+    const { data: requesterRole, error: roleError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .single()
 
-    if (roleError || roleData?.role !== 'admin') {
+    if (roleError || requesterRole?.role !== 'admin') {
       return new Response(
         JSON.stringify({ error: 'Only admins can list users' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Get user IDs from request
-    const { userIds } = await req.json()
+    // Fetch all roles (service role bypasses RLS)
+    const { data: roles, error: rolesError } = await supabaseAdmin
+      .from('user_roles')
+      .select('user_id, role, created_at')
+      .order('created_at', { ascending: true })
 
-    if (!userIds || !Array.isArray(userIds)) {
+    if (rolesError) {
       return new Response(
-        JSON.stringify({ error: 'userIds array is required' }),
+        JSON.stringify({ error: rolesError.message }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Fetch user details for each ID
-    const users = []
-    for (const userId of userIds) {
-      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+    // Build users list with email + role
+    const users: Array<{ id: string; email: string; role: string; created_at: string }> = []
+    for (const r of roles ?? []) {
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(r.user_id)
       if (!userError && userData?.user) {
         users.push({
           id: userData.user.id,
-          email: userData.user.email
+          email: userData.user.email ?? 'Unknown',
+          role: r.role as string,
+          created_at: r.created_at as string,
         })
       }
     }
 
     return new Response(
       JSON.stringify({ users }),
-      { 
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
-
   } catch (error) {
     console.error('Error listing users:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ error: (error as Error).message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })

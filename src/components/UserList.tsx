@@ -40,41 +40,20 @@ export const UserList = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      
-      // Get all user roles
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role, created_at');
 
-      if (rolesError) throw rolesError;
-
-      // Get current session to fetch user details
+      // Ensure authenticated
       const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('Not authenticated');
-      }
+      if (!session) throw new Error('Not authenticated');
 
-      // Call edge function to get user emails
+      // Fetch full user list (emails + roles) via edge function (service role)
       const { data: usersData, error: usersError } = await supabase.functions.invoke('list-users', {
-        body: { userIds: rolesData?.map(r => r.user_id) || [] }
+        headers: { Authorization: `Bearer ${session.access_token}` }
       });
 
       if (usersError) throw usersError;
       if (usersData?.error) throw new Error(usersData.error);
 
-      // Combine roles and user data
-      const combinedUsers = rolesData?.map(role => {
-        const userData = usersData.users.find((u: any) => u.id === role.user_id);
-        return {
-          id: role.user_id,
-          email: userData?.email || 'Unknown',
-          role: role.role,
-          created_at: role.created_at
-        };
-      }) || [];
-
-      setUsers(combinedUsers);
+      setUsers(usersData.users || []);
     } catch (error: any) {
       console.error('Error fetching users:', error);
       toast({
@@ -106,7 +85,8 @@ export const UserList = () => {
       }
 
       const { data, error } = await supabase.functions.invoke('delete-user', {
-        body: { userId }
+        body: { userId },
+        headers: { Authorization: `Bearer ${session.access_token}` }
       });
 
       if (error) throw error;
