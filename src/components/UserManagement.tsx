@@ -62,9 +62,19 @@ export const UserManagement = () => {
       setRole('user');
     } catch (error: any) {
       console.error('Error creating user:', error);
+      
+      // Extract the actual error message
+      let errorMessage = 'Failed to create user.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || "Failed to create user.",
+        title: "Error Creating User",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
