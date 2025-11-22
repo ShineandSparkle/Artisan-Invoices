@@ -44,29 +44,150 @@ const generateCommonHeader = (title: string, companySettings: CompanySettings, l
 
 const generateStyles = () => `
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; padding: 20px; font-size: 12px; line-height: 1.4; }
-    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .logo { height: 60px; width: auto; object-fit: contain; }
-    .title-block { flex: 1; text-align: center; }
-    .title-block h1 { font-size: 22px; text-decoration: underline; padding-bottom: 5px; }
-    .title-block h2 { font-size: 18px; margin: 5px 0; }
-    .title-block p { margin: 2px 0; }
-    .spacer { width: 60px; }
-    .invoice-info, .quotation-info { display: flex; justify-content: space-between; margin: 15px 0; padding: 10px 0; border-top: 2px solid #000; border-bottom: 2px solid #000; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { border: 1px solid #000; padding: 6px; text-align: left; }
-    th { background-color: #f2f2f2; font-weight: bold; }
-    .text-right { text-align: right; }
-    .text-center { text-align: center; }
-    .totals-wrapper { display: flex; justify-content: flex-end; margin-top: 10px; }
-    .totals-table { width: auto; min-width: 250px; border-collapse: collapse; font-size: 11px; }
-    .totals-table td { border: 1px solid #000; padding: 4px 6px; }
-    .amount-words { margin: 20px 0; padding: 10px; border: 1px solid #000; }
-    .footer-section { display: flex; justify-content: space-between; margin-top: 40px; }
-    .bank-details, .signature { width: 45%; border: 2px solid #000; padding: 10px; }
-    .signature { display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-    @media print { body { padding: 10px; } @page { margin: 0.5cm; } }
+    /* GLOBAL RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* HEADER */
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px; /* uniform spacing */
+    }
+
+    .logo {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .title-block {
+      flex: 1;
+      text-align: center;
+    }
+
+    .title-block h1 {
+      font-size: 22px;
+      text-decoration: underline;
+      padding-bottom: 5px;
+    }
+
+    .title-block h2 {
+      font-size: 18px;
+      margin: 6px 0;
+    }
+
+    .title-block p {
+      margin: 3px 0;
+    }
+
+    .spacer {
+      width: 60px;
+    }
+
+    /* BILLING / CUSTOMER SECTION */
+    .invoice-info,
+    .quotation-info {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0; /* uniform spacing */
+      padding: 12px 0;
+      border-top: 2px solid #000;
+      border-bottom: 2px solid #000;
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0; /* uniform spacing */
+    }
+
+    th, td {
+      border: 1px solid #000;
+      padding: 6px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    /* TOTALS */
+    .totals-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px; /* uniform spacing */
+    }
+
+    .totals-table {
+      width: auto;
+      min-width: 250px;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .totals-table td {
+      border: 1px solid #000;
+      padding: 4px 6px;
+    }
+
+    /* AMOUNT IN WORDS / NOTES / TERMS */
+    .amount-words {
+      margin: 15px 0; /* uniform spacing */
+      padding: 10px;
+      border: 1px solid #000;
+    }
+
+    /* FOOTER */
+    .footer-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px; /* uniform spacing */
+    }
+
+    .bank-details,
+    .signature {
+      width: 45%;
+      border: 2px solid #000;
+      padding: 12px;
+    }
+
+    .signature {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    @media print {
+      body {
+        padding: 10px;
+      }
+      @page {
+        margin: 0.5cm;
+      }
+    }
   </style>
 `;
 
