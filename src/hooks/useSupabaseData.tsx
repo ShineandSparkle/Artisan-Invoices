@@ -162,7 +162,12 @@ export const useSupabaseData = () => {
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setCustomers(prev => [payload.new as Customer, ...prev]);
+            setCustomers(prev => {
+              // Check if customer already exists to prevent duplicates
+              const exists = prev.some(c => c.id === payload.new.id);
+              if (exists) return prev;
+              return [payload.new as Customer, ...prev];
+            });
           } else if (payload.eventType === 'UPDATE') {
             setCustomers(prev => 
               prev.map(c => c.id === payload.new.id ? payload.new as Customer : c)
@@ -194,11 +199,16 @@ export const useSupabaseData = () => {
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            const newInvoice = {
-              ...payload.new,
-              items: Array.isArray(payload.new.items) ? payload.new.items : []
-            } as Invoice;
-            setInvoices(prev => [newInvoice, ...prev]);
+            setInvoices(prev => {
+              // Check if invoice already exists to prevent duplicates
+              const exists = prev.some(i => i.id === payload.new.id);
+              if (exists) return prev;
+              const newInvoice = {
+                ...payload.new,
+                items: Array.isArray(payload.new.items) ? payload.new.items : []
+              } as Invoice;
+              return [newInvoice, ...prev];
+            });
           } else if (payload.eventType === 'UPDATE') {
             setInvoices(prev => 
               prev.map(i => i.id === payload.new.id ? {
@@ -247,7 +257,12 @@ export const useSupabaseData = () => {
               } as Quotation;
 
               if (payload.eventType === 'INSERT') {
-                setQuotations(prev => [quotation, ...prev]);
+                setQuotations(prev => {
+                  // Check if quotation already exists to prevent duplicates
+                  const exists = prev.some(q => q.id === data.id);
+                  if (exists) return prev;
+                  return [quotation, ...prev];
+                });
               } else {
                 setQuotations(prev => 
                   prev.map(q => q.id === data.id ? quotation : q)
