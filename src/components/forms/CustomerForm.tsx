@@ -148,11 +148,20 @@ const CustomerForm = ({ onSubmit, onCancel, initialData, mode = 'create' }: Cust
                   <SelectValue placeholder="Select size" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
+                  <SelectItem value="36">36</SelectItem>
+                  <SelectItem value="37">37</SelectItem>
+                  <SelectItem value="38">38</SelectItem>
                   <SelectItem value="39">39</SelectItem>
                   <SelectItem value="40">40</SelectItem>
+                  <SelectItem value="41">41</SelectItem>
                   <SelectItem value="42">42</SelectItem>
+                  <SelectItem value="43">43</SelectItem>
                   <SelectItem value="44">44</SelectItem>
+                  <SelectItem value="45">45</SelectItem>
                   <SelectItem value="46">46</SelectItem>
+                  <SelectItem value="47">47</SelectItem>
+                  <SelectItem value="48">48</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
                 </SelectContent>
               </Select>
             </div>
