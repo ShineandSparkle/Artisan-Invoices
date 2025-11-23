@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Trash2, Edit, Eye, Plus, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSupabaseData } from "@/hooks/useSupabaseData";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface ProductStockData {
   product: string;
@@ -64,6 +65,7 @@ const StockRegister = () => {
   
   const { toast } = useToast();
   const { fetchStockRegister, addStockEntry, updateStockEntry, deleteStockEntry } = useSupabaseData();
+  const { isAdmin } = useUserRole();
 
   useEffect(() => {
     loadStockData();
@@ -436,6 +438,8 @@ const StockRegister = () => {
                           value={sizeData.openingStock}
                           onChange={(e) => handleStockChange(size, 'openingStock', e.target.value)}
                           min="0"
+                          disabled={!isAdmin}
+                          className={!isAdmin ? "opacity-50 cursor-not-allowed" : ""}
                         />
                       </div>
                       
@@ -458,6 +462,8 @@ const StockRegister = () => {
                           value={sizeData.sales}
                           onChange={(e) => handleStockChange(size, 'sales', e.target.value)}
                           min="0"
+                          disabled={!isAdmin}
+                          className={!isAdmin ? "opacity-50 cursor-not-allowed" : ""}
                         />
                       </div>
                       

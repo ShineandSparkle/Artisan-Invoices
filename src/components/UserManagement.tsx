@@ -41,6 +41,20 @@ export const UserManagement = () => {
         body: { email, password, role }
       });
 
+      // Check for successful response
+      if (data?.success) {
+        toast({
+          title: "User Created",
+          description: `User ${email} created successfully with ${role} role.`
+        });
+
+        // Reset form
+        setEmail("");
+        setPassword("");
+        setRole('user');
+        return;
+      }
+
       // Handle edge function errors
       if (error) {
         throw new Error(error.message || 'Failed to create user');
@@ -51,15 +65,9 @@ export const UserManagement = () => {
         throw new Error(data.error);
       }
 
-      toast({
-        title: "User Created",
-        description: `User ${email} created successfully with ${role} role.`
-      });
+      // If we got here, something unexpected happened
+      throw new Error('Unexpected response from server');
 
-      // Reset form
-      setEmail("");
-      setPassword("");
-      setRole('user');
     } catch (error: any) {
       console.error('Error creating user:', error);
       

@@ -16,6 +16,7 @@ interface DashboardProps {
   quotations: any[];
   invoices: any[];
   customers: any[];
+  expenses?: any[];
   onCreateQuotation: () => void;
   onCreateInvoice: () => void;
   onCreateCustomer: () => void;
@@ -23,7 +24,7 @@ interface DashboardProps {
   onViewInvoices: () => void;
 }
 
-const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreateInvoice, onCreateCustomer, onViewQuotations, onViewInvoices }: DashboardProps) => {
+const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuotation, onCreateInvoice, onCreateCustomer, onViewQuotations, onViewInvoices }: DashboardProps) => {
   const totalRevenue = invoices
     .filter(i => i.status === "paid")
     .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
@@ -37,6 +38,14 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
     .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
   
   const activeQuotations = quotations.filter(q => q.status !== "invoiced" && q.status !== "rejected").length;
+
+  // Calculate total expenses for current month
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+  const totalExpenses = expenses
+    .filter(e => e.month === currentMonth && e.year === currentYear)
+    .reduce((sum, e) => sum + (e.amount || 0), 0);
 
   const stats = [
     {
@@ -73,6 +82,13 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
       change: "+5",
       icon: Users,
       color: "text-muted-foreground"
+    },
+    {
+      title: "Monthly Expenses",
+      value: `₹${totalExpenses.toLocaleString()}`,
+      change: "This month",
+      icon: DollarSign,
+      color: "text-warning"
     }
   ];
 
@@ -117,7 +133,7 @@ const Dashboard = ({ quotations, invoices, customers, onCreateQuotation, onCreat
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
         {stats.map((stat, index) => (
           <Card key={index} className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
