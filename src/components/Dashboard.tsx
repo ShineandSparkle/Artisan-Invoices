@@ -11,6 +11,7 @@ import {
   Clock,
   CheckCircle
 } from "lucide-react";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface DashboardProps {
   quotations: any[];
@@ -25,6 +26,8 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuotation, onCreateInvoice, onCreateCustomer, onViewQuotations, onViewInvoices }: DashboardProps) => {
+  const { isAdmin } = useUserRole();
+  
   const totalRevenue = invoices
     .filter(i => i.status === "paid")
     .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
@@ -217,28 +220,30 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button className="h-20 flex-col space-y-2" onClick={onCreateQuotation}>
-              <FileText className="h-6 w-6" />
-              <span>Create Quotation</span>
-            </Button>
-            <Button className="h-20 flex-col space-y-2" variant="outline" onClick={onCreateInvoice}>
-              <Receipt className="h-6 w-6" />
-              <span>Create Invoice</span>
-            </Button>
-            <Button className="h-20 flex-col space-y-2" variant="outline" onClick={onCreateCustomer}>
-              <Users className="h-6 w-6" />
-              <span>Add Customer</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Quick Actions - Admin Only */}
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button className="h-20 flex-col space-y-2" onClick={onCreateQuotation}>
+                <FileText className="h-6 w-6" />
+                <span>Create Quotation</span>
+              </Button>
+              <Button className="h-20 flex-col space-y-2" variant="outline" onClick={onCreateInvoice}>
+                <Receipt className="h-6 w-6" />
+                <span>Create Invoice</span>
+              </Button>
+              <Button className="h-20 flex-col space-y-2" variant="outline" onClick={onCreateCustomer}>
+                <Users className="h-6 w-6" />
+                <span>Add Customer</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
