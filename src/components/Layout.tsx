@@ -31,10 +31,11 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
 
   const allNavigation = [
     { name: "Dashboard", icon: BarChart3, key: "dashboard" },
-    { name: "Quotations", icon: FileText, key: "quotations" },
-    { name: "Invoices", icon: Receipt, key: "invoices" },
-    { name: "Customers", icon: Users, key: "customers" },
+    { name: "Quotations", icon: FileText, key: "quotations", adminOnly: true },
+    { name: "Invoices", icon: Receipt, key: "invoices", adminOnly: true },
+    { name: "Customers", icon: Users, key: "customers", adminOnly: true },
     { name: "Stock Register", icon: Package, key: "stock-register" },
+    { name: "Expense Register", icon: Receipt, key: "expense-register" },
     { name: "Settings", icon: Settings, key: "settings", adminOnly: true },
   ];
 

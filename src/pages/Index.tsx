@@ -5,6 +5,7 @@ import InvoiceList from "@/components/InvoiceList";
 import CustomerList from "@/components/CustomerList";
 import Settings from "@/pages/Settings";
 import StockRegister from "@/components/StockRegister";
+import ExpenseRegister from "@/components/ExpenseRegister";
 import CustomerForm from "@/components/forms/CustomerForm";
 import InvoiceForm from "@/components/forms/InvoiceForm";
 import InvoiceDetails from "@/components/InvoiceDetails";
@@ -15,6 +16,7 @@ import { useSupabaseData } from "@/hooks/useSupabaseData";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState("dashboard");
@@ -23,6 +25,7 @@ const Index = () => {
   const [editingQuotation, setEditingQuotation] = useState(null);
   const [viewingInvoice, setViewingInvoice] = useState(null);
   const [viewingQuotation, setViewingQuotation] = useState(null);
+  const [expenses, setExpenses] = useState<any[]>([]);
   const { toast } = useToast();
   const { companySettings, invoiceSettings } = useSettings();
   const {
@@ -39,6 +42,21 @@ const Index = () => {
     deleteInvoice,
     deleteQuotation
   } = useSupabaseData();
+
+  // Load expenses for dashboard
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        const { data } = await supabase
+          .from('expense_register')
+          .select('*');
+        if (data) setExpenses(data);
+      } catch (error) {
+        console.error('Error loading expenses:', error);
+      }
+    };
+    loadExpenses();
+  }, []);
 
   const handlePageChange = (page: string) => {
     // Handle direct action pages
@@ -279,7 +297,8 @@ const Index = () => {
           <Dashboard 
             quotations={quotations} 
             invoices={invoices} 
-            customers={customers} 
+            customers={customers}
+            expenses={expenses}
             onCreateQuotation={handleCreateQuotation}
             onCreateInvoice={handleCreateInvoice}
             onCreateCustomer={handleCreateCustomer}
@@ -351,6 +370,8 @@ const Index = () => {
         );
       case "stock-register":
         return <StockRegister />;
+      case "expense-register":
+        return <ExpenseRegister />;
       case "settings":
         return <Settings />;
       default:
@@ -358,7 +379,8 @@ const Index = () => {
           <Dashboard 
             quotations={quotations} 
             invoices={invoices} 
-            customers={customers} 
+            customers={customers}
+            expenses={expenses}
             onCreateQuotation={handleCreateQuotation}
             onCreateInvoice={handleCreateInvoice}
             onCreateCustomer={handleCreateCustomer}
