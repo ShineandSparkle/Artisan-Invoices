@@ -36,13 +36,9 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
     .filter(i => i.status === "unpaid" || i.status === "sent")
     .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
   
-  const totalUnpaid = invoices
-    .filter(i => i.status === "unpaid" || i.status === "sent")
-    .reduce((sum, i) => sum + (i.total_amount || i.subtotal || 0), 0);
-  
   const activeQuotations = quotations.filter(q => q.status !== "invoiced" && q.status !== "rejected").length;
 
-  // Calculate total expenses for current month
+  // Monthly expenses
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
@@ -50,6 +46,7 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
     .filter(e => e.month === currentMonth && e.year === currentYear)
     .reduce((sum, e) => sum + (e.amount || 0), 0);
 
+  // Stats WITHOUT UNPAID card
   const stats = [
     {
       title: "Total Revenue",
@@ -71,13 +68,6 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
       change: "+8",
       icon: Receipt,
       color: "text-primary"
-    },
-    {
-      title: "Unpaid",
-      value: `₹${totalUnpaid.toLocaleString()}`,
-      change: "+3",
-      icon: Clock,
-      color: "text-destructive"
     },
     {
       title: "Total Customers",
@@ -136,7 +126,7 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {stats.map((stat, index) => (
           <Card key={index} className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
