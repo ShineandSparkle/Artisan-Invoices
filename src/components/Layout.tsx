@@ -34,8 +34,8 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
     { name: "Quotations", icon: FileText, key: "quotations", adminOnly: true },
     { name: "Invoices", icon: Receipt, key: "invoices", adminOnly: true },
     { name: "Customers", icon: Users, key: "customers", adminOnly: true },
-    { name: "Stock Register", icon: Package, key: "stock-register" },
-    { name: "Expense Register", icon: Receipt, key: "expense-register" },
+    { name: "Stock Reg", icon: Package, key: "stock-register" },
+    { name: "Expenses", icon: Receipt, key: "expense-register" },
     { name: "Settings", icon: Settings, key: "settings", adminOnly: true },
   ];
 
@@ -130,12 +130,12 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col" style={{ paddingBottom: FOOTER_HEIGHT }}>
-        {/* Page Title Bar */}
+        {/* Page Title Bar
         <div className="bg-muted/30 px-6 py-4 border-b">
           <h2 className="text-2xl font-semibold text-foreground capitalize text-center">
             {currentPage.replace('-', ' ')}
           </h2>
-        </div>
+        </div> */}
 
         {/* Page content */}
         <main className="flex-1 p-6 overflow-auto">{children}</main>
