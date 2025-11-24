@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   FileText, 
-  Receipt, 
+  ReceiptIndianRupee, 
   Users, 
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   Eye,
   Clock,
@@ -52,7 +52,7 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
       title: "Total Revenue",
       value: `₹${totalRevenue.toLocaleString()}`,
       change: "+12.5%",
-      icon: DollarSign,
+      icon: IndianRupee,
       color: "text-success"
     },
     {
@@ -63,10 +63,10 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
       color: "text-primary"
     },
     {
-      title: "Invoiced",
+      title: "Invoiced - Unpaid",
       value: `₹${totalInvoiced.toLocaleString()}`,
       change: "+8",
-      icon: Receipt,
+      icon: ReceiptIndianRupee,
       color: "text-primary"
     },
     {
@@ -80,7 +80,7 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
       title: "Monthly Expenses",
       value: `₹${totalExpenses.toLocaleString()}`,
       change: "This month",
-      icon: DollarSign,
+      icon: IndianRupee,
       color: "text-warning"
     }
   ];
@@ -182,7 +182,7 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Receipt className="mr-2 h-5 w-5" />
+              <ReceiptIndianRupee className="mr-2 h-5 w-5" />
               Recent Invoices
             </CardTitle>
           </CardHeader>
@@ -223,7 +223,7 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
                 <span>Create Quotation</span>
               </Button>
               <Button className="h-20 flex-col space-y-2" variant="outline" onClick={onCreateInvoice}>
-                <Receipt className="h-6 w-6" />
+                <ReceiptIndianRupee className="h-6 w-6" />
                 <span>Create Invoice</span>
               </Button>
               <Button className="h-20 flex-col space-y-2" variant="outline" onClick={onCreateCustomer}>
