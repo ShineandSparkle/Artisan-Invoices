@@ -61,6 +61,7 @@ const StockRegister = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [stockEntries, setStockEntries] = useState([]);
+  const [editFormData, setEditFormData] = useState({});
 
   const { toast } = useToast();
   const {
@@ -114,6 +115,88 @@ const StockRegister = () => {
   const calculateClosingStock = (os, p, s) => os + p - s;
 
   const handlePrint = () => window.print();
+
+  const handleView = (product) => {
+    setViewingProduct(product);
+    setIsViewDialogOpen(true);
+  };
+
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    const formData = {};
+    SIZES.forEach((size) => {
+      formData[size] = product.sizes[size];
+    });
+    setEditFormData(formData);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = async (productName) => {
+    if (!confirm(`Are you sure you want to delete all stock entries for ${productName}?`)) {
+      return;
+    }
+
+    const entriesToDelete = stockEntries.filter(
+      (e) => e.product_name === productName
+    );
+
+    for (const entry of entriesToDelete) {
+      await deleteStockEntry(entry.id);
+    }
+
+    toast({
+      title: "Success",
+      description: `Deleted all stock entries for ${productName}`,
+    });
+
+    loadStockData();
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingProduct) return;
+
+    for (const size of SIZES) {
+      const data = editFormData[size];
+      const entry = stockEntries.find(
+        (e) =>
+          e.product_name === editingProduct.product && e.size === size
+      );
+
+      const closingStock = calculateClosingStock(
+        data.openingStock,
+        data.production,
+        data.sales
+      );
+
+      if (entry) {
+        await updateStockEntry(entry.id, {
+          opening_stock: data.openingStock,
+          production: data.production,
+          sales: data.sales,
+          closing_stock: closingStock,
+        });
+      } else {
+        await addStockEntry({
+          product_name: editingProduct.product,
+          size: size,
+          month: selectedMonth,
+          year: selectedYear,
+          opening_stock: data.openingStock,
+          production: data.production,
+          sales: data.sales,
+          closing_stock: closingStock,
+        });
+      }
+    }
+
+    toast({
+      title: "Success",
+      description: `Updated stock for ${editingProduct.product}`,
+    });
+
+    setIsEditDialogOpen(false);
+    loadStockData();
+  };
 
   return (
     <div className="space-y-6">
@@ -318,14 +401,26 @@ const StockRegister = () => {
 
                       <td className="p-4 no-print">
                         <div className="flex justify-center space-x-2">
-                          <Button size="sm" variant="outline">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleView(product)}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(product)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           {isAdmin && (
-                            <Button size="sm" variant="outline">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDelete(product.product)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           )}
@@ -340,22 +435,149 @@ const StockRegister = () => {
         </CardContent>
       </Card>
 
-      {/* Edit and View dialogs (kept unchanged) */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Stock - {editingProduct}</DialogTitle>
-          </DialogHeader>
-          {/* Recreate the edit dialog contents here if you want full editing functionality */}
-        </DialogContent>
-      </Dialog>
-
+      {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>View Stock - {viewingProduct}</DialogTitle>
+            <DialogTitle>
+              View Stock - {viewingProduct?.product}
+            </DialogTitle>
           </DialogHeader>
-          {/* Recreate the view dialog contents here if you want full view functionality */}
+          {viewingProduct && (
+            <div className="space-y-4">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3">Size</th>
+                    <th className="text-center p-3">Opening Stock</th>
+                    <th className="text-center p-3">Production</th>
+                    <th className="text-center p-3">Sales</th>
+                    <th className="text-center p-3">Closing Stock</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SIZES.map((size) => {
+                    const d = viewingProduct.sizes[size];
+                    return (
+                      <tr key={size} className="border-b">
+                        <td className="p-3 font-medium">{size}</td>
+                        <td className="text-center p-3">{d.openingStock}</td>
+                        <td className="text-center p-3">{d.production}</td>
+                        <td className="text-center p-3">{d.sales}</td>
+                        <td className="text-center p-3 font-bold text-primary">
+                          {calculateClosingStock(
+                            d.openingStock,
+                            d.production,
+                            d.sales
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Edit Stock - {editingProduct?.product}
+            </DialogTitle>
+          </DialogHeader>
+          {editingProduct && (
+            <div className="space-y-4">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3">Size</th>
+                    <th className="text-center p-3">Opening Stock</th>
+                    <th className="text-center p-3">Production</th>
+                    <th className="text-center p-3">Sales</th>
+                    <th className="text-center p-3">Closing Stock</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SIZES.map((size) => {
+                    const d = editFormData[size] || {};
+                    return (
+                      <tr key={size} className="border-b">
+                        <td className="p-3 font-medium">{size}</td>
+                        <td className="text-center p-3">
+                          <Input
+                            type="number"
+                            value={d.openingStock || 0}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                [size]: {
+                                  ...d,
+                                  openingStock: parseInt(e.target.value) || 0,
+                                },
+                              })
+                            }
+                            className="w-20 text-center"
+                          />
+                        </td>
+                        <td className="text-center p-3">
+                          <Input
+                            type="number"
+                            value={d.production || 0}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                [size]: {
+                                  ...d,
+                                  production: parseInt(e.target.value) || 0,
+                                },
+                              })
+                            }
+                            className="w-20 text-center"
+                          />
+                        </td>
+                        <td className="text-center p-3">
+                          <Input
+                            type="number"
+                            value={d.sales || 0}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                [size]: {
+                                  ...d,
+                                  sales: parseInt(e.target.value) || 0,
+                                },
+                              })
+                            }
+                            className="w-20 text-center"
+                          />
+                        </td>
+                        <td className="text-center p-3 font-bold text-primary">
+                          {calculateClosingStock(
+                            d.openingStock || 0,
+                            d.production || 0,
+                            d.sales || 0
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveEdit}>Save Changes</Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
