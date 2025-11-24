@@ -49,17 +49,17 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Header Navigation */}
-      <header className="bg-card border-b shadow-sm px-4 py-3" style={{ height: HEADER_HEIGHT }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-          <div className="flex items-center justify-between h-full">
+      <header className="bg-card border-b shadow-sm py-3" style={{ height: HEADER_HEIGHT }}>
+        <div className="w-full h-full px-2.5">
+          <div className="flex items-center h-full">
             {/* Logo and Brand */}
             <div className="flex items-center gap-2 sm:gap-3">
               <img src="/logo.png" alt="Company Logo" className="w-8 h-8 sm:w-10 sm:h-10" />
               <h1 className="text-lg sm:text-xl font-bold text-primary">ARTISAN</h1>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
+            {/* Desktop Navigation - pushed to right */}
+            <nav className="hidden md:flex items-center space-x-1 ml-auto">
               {navigation.map((item) => (
                 <Button
                   key={item.key}
@@ -71,29 +71,26 @@ const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
                   {item.name}
                 </Button>
               ))}
-            </nav>
-
-            {/* Right side - Logout and Mobile menu button */}
-            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="hidden md:flex items-center gap-2"
+                className="flex items-center gap-2"
               >
                 <LogOut className="h-4 w-4" />
                 Logout
               </Button>
-              {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
+            </nav>
+
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden ml-auto"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
 
