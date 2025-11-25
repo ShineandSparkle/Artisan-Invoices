@@ -103,6 +103,7 @@ export type Database = {
       }
       invoices: {
         Row: {
+          complimentary: boolean | null
           created_at: string
           customer_address: string | null
           customer_city: string | null
@@ -123,6 +124,7 @@ export type Database = {
           status: string
           subtotal: number
           tax_amount: number
+          tax_mode: string | null
           tax_rate: number | null
           tax_type: string | null
           total_amount: number
@@ -130,6 +132,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          complimentary?: boolean | null
           created_at?: string
           customer_address?: string | null
           customer_city?: string | null
@@ -150,6 +153,7 @@ export type Database = {
           status?: string
           subtotal?: number
           tax_amount?: number
+          tax_mode?: string | null
           tax_rate?: number | null
           tax_type?: string | null
           total_amount?: number
@@ -157,6 +161,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          complimentary?: boolean | null
           created_at?: string
           customer_address?: string | null
           customer_city?: string | null
@@ -177,6 +182,7 @@ export type Database = {
           status?: string
           subtotal?: number
           tax_amount?: number
+          tax_mode?: string | null
           tax_rate?: number | null
           tax_type?: string | null
           total_amount?: number
@@ -232,6 +238,7 @@ export type Database = {
       quotations: {
         Row: {
           amount: number
+          complimentary: boolean | null
           created_at: string
           customer_id: string | null
           date: string
@@ -242,6 +249,7 @@ export type Database = {
           status: string
           subtotal: number
           tax_amount: number
+          tax_mode: string | null
           tax_type: string | null
           updated_at: string
           user_id: string | null
@@ -249,6 +257,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          complimentary?: boolean | null
           created_at?: string
           customer_id?: string | null
           date: string
@@ -259,6 +268,7 @@ export type Database = {
           status?: string
           subtotal?: number
           tax_amount?: number
+          tax_mode?: string | null
           tax_type?: string | null
           updated_at?: string
           user_id?: string | null
@@ -266,6 +276,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          complimentary?: boolean | null
           created_at?: string
           customer_id?: string | null
           date?: string
@@ -276,6 +287,7 @@ export type Database = {
           status?: string
           subtotal?: number
           tax_amount?: number
+          tax_mode?: string | null
           tax_type?: string | null
           updated_at?: string
           user_id?: string | null
