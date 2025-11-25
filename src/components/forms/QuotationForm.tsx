@@ -37,7 +37,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
     taxType: "IGST_18",
     status: "sent",
     complimentary: false,
-    taxMode: "exclusive"
+    taxMode: "inclusive"
   });
 
   const [items, setItems] = useState<QuotationItem[]>([
@@ -324,18 +324,6 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                     <input
                       type="radio"
                       name="taxMode"
-                      value="exclusive"
-                      checked={formData.taxMode === 'exclusive'}
-                      onChange={(e) => handleChange('taxMode', e.target.value)}
-                      className="mr-2"
-                      disabled={formData.complimentary}
-                    />
-                    Exclusive Tax
-                  </Label>
-                  <Label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="taxMode"
                       value="inclusive"
                       checked={formData.taxMode === 'inclusive'}
                       onChange={(e) => handleChange('taxMode', e.target.value)}
@@ -343,6 +331,18 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
                       disabled={formData.complimentary}
                     />
                     Inclusive Tax
+                  </Label>
+                  <Label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="taxMode"
+                      value="exclusive"
+                      checked={formData.taxMode === 'exclusive'}
+                      onChange={(e) => handleChange('taxMode', e.target.value)}
+                      className="mr-2"
+                      disabled={formData.complimentary}
+                    />
+                    Exclusive Tax
                   </Label>
                 </div>
               </div>
