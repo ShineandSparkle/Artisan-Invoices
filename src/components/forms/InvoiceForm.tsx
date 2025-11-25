@@ -77,8 +77,8 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
         notes: initialData.notes || "",
         taxType: initialData.tax_type || "IGST_18",
         status: initialData.status?.toLowerCase() || "draft",
-        complimentary: false,
-        taxMode: "exclusive"
+        complimentary: initialData.complimentary || false,
+        taxMode: initialData.tax_mode || "exclusive"
       });
       
       // Process items to handle products not in dropdown
@@ -174,6 +174,8 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       due_date: formData.dueDate,
       notes: formData.notes,
       tax_type: formData.taxType,
+      tax_mode: formData.taxMode,
+      complimentary: formData.complimentary,
       items: validItems,
       total_amount: grandTotal,
       subtotal: subtotal,

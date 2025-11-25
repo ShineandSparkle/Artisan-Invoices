@@ -74,8 +74,8 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
         notes: initialData.notes || "",
         taxType: initialData.tax_type || "IGST_18",
         status: initialData.status || "pending",
-        complimentary: false,
-        taxMode: "exclusive"
+        complimentary: initialData.complimentary || false,
+        taxMode: initialData.tax_mode || "exclusive"
       });
       
       // Process items to handle products not in dropdown
@@ -161,6 +161,8 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
       valid_until: formData.validUntil,
       notes: formData.notes,
       tax_type: formData.taxType,
+      tax_mode: formData.taxMode,
+      complimentary: formData.complimentary,
       items: processedItems,
       amount: grandTotal,
       subtotal: subtotal,
