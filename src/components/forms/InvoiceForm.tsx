@@ -160,7 +160,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
 
     const selectedCustomer = customers.find(c => c.id === formData.customerId);
     
-    const invoiceData = {
+    const invoiceData: any = {
       customer_name: selectedCustomer?.name || "",
       customer_email: selectedCustomer?.email || "",
       customer_phone: selectedCustomer?.phone || "",
@@ -182,6 +182,13 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       tax_amount: taxAmount,
       status: formData.status
     };
+
+    // Only set paid_date if status is paid, otherwise clear it
+    if (formData.status === 'paid') {
+      invoiceData.paid_date = initialData?.paid_date || new Date().toISOString().split('T')[0];
+    } else {
+      invoiceData.paid_date = null;
+    }
 
     setLoading(true);
     try {

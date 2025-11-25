@@ -159,7 +159,7 @@ const InvoiceList = ({
                       <TableCell className={invoice.status === "overdue" ? "text-destructive font-medium" : ""}>
                         {invoice.dueDate}
                       </TableCell>
-                      <TableCell>{invoice.paidDate}</TableCell>
+                      <TableCell>{invoice.status?.toLowerCase() === 'paid' ? invoice.paidDate : '-'}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
