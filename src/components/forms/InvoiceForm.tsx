@@ -301,22 +301,24 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
               </div>
 
               <div>
-                <Label htmlFor="date">Invoice Date</Label>
+                <Label htmlFor="date">Invoice Date *</Label>
                 <Input
                   id="date"
                   type="date"
                   value={formData.date}
                   onChange={(e) => handleChange("date", e.target.value)}
+                  required
                 />
               </div>
 
               <div>
-                <Label htmlFor="dueDate">Due Date</Label>
+                <Label htmlFor="dueDate">Due Date *</Label>
                 <Input
                   id="dueDate"
                   type="date"
                   value={formData.dueDate}
                   onChange={(e) => handleChange("dueDate", e.target.value)}
+                  required
                 />
               </div>
 
@@ -474,7 +476,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                 <div key={index} className="grid grid-cols-12 gap-2 items-end">
                   {index === 0 && (
                     <div className="col-span-5">
-                      <Label htmlFor={`description-${index}`}>Description</Label>
+                      <Label htmlFor={`description-${index}`}>Description *</Label>
                       <Select 
                         value={item.description} 
                         onValueChange={(value) => handleItemChange(index, "description", value)}
@@ -539,7 +541,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
                   )}
                   {index === 0 && (
                     <div className="col-span-1">
-                      <Label htmlFor={`shirt_size-${index}`}>Size</Label>
+                      <Label htmlFor={`shirt_size-${index}`}>Size *</Label>
                       <Select 
                         value={item.shirt_size} 
                         onValueChange={(value) => handleItemChange(index, "shirt_size", value)}
