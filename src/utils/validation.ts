@@ -14,8 +14,8 @@ export const customerSchema = z.object({
 });
 
 export const invoiceItemSchema = z.object({
-  description: z.string().trim().max(500).optional().or(z.literal("")),
-  shirt_size: z.string().trim().max(10).optional().or(z.literal("")),
+  description: z.string().trim().min(1, "Description is required").max(500),
+  shirt_size: z.string().trim().min(1, "Shirt size is required").max(10),
   quantity: z.number().int().positive("Quantity must be positive").max(999999),
   rate: z.number().positive("Rate must be positive").max(99999999),
   amount: z.number().positive().max(99999999)
@@ -23,18 +23,18 @@ export const invoiceItemSchema = z.object({
 
 export const invoiceSchema = z.object({
   customer_name: z.string().trim().min(1, "Customer name is required").max(100),
-  customer_email: z.string().trim().email("Invalid email").max(255).optional().or(z.literal("")),
-  customer_phone: z.string().trim().max(20).optional().or(z.literal("")),
+  customer_email: z.string().trim().email("Invalid email").max(255),
+  customer_phone: z.string().trim().min(1, "Phone is required").max(20),
   invoice_date: z.string().min(1, "Invoice date is required"),
-  due_date: z.string().optional(),
+  due_date: z.string().min(1, "Due date is required"),
   items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
   notes: z.string().max(1000).optional().or(z.literal("")),
   tax_rate: z.number().min(0).max(100).optional()
 });
 
 export const quotationItemSchema = z.object({
-  description: z.string().trim().max(500).optional().or(z.literal("")),
-  shirt_size: z.string().trim().max(10).optional().or(z.literal("")),
+  description: z.string().trim().min(1, "Description is required").max(500),
+  shirt_size: z.string().trim().min(1, "Shirt size is required").max(10),
   quantity: z.number().int().positive("Quantity must be positive").max(999999),
   rate: z.number().positive("Rate must be positive").max(99999999)
 });
@@ -42,7 +42,7 @@ export const quotationItemSchema = z.object({
 export const quotationSchema = z.object({
   customer_id: z.string().uuid("Invalid customer selection"),
   date: z.string().min(1, "Date is required"),
-  valid_until: z.string().optional(),
+  valid_until: z.string().min(1, "Valid until date is required"),
   items: z.array(quotationItemSchema).min(1, "At least one item is required"),
   notes: z.string().max(1000).optional().or(z.literal("")),
   tax_type: z.string().optional()
