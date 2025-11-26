@@ -109,6 +109,24 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       return;
     }
 
+    if (!formData.date) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter invoice date.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.dueDate) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter due date.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Process items to use custom description if applicable
     const processedItems = items.map(item => {
       if (item.description === "__custom__" && item.customDescription) {
@@ -117,14 +135,24 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
       return item;
     });
     
+    // Validate that ALL fields are filled for each item
     const validItems = processedItems.filter(item => 
-      (item.description.trim() || item.shirt_size.trim()) && item.quantity > 0 && item.rate > 0
+      item.description.trim() && item.shirt_size.trim() && item.quantity > 0 && item.rate > 0
     );
     
     if (validItems.length === 0) {
       toast({
         title: "Validation Error",
-        description: "Please add at least one valid item.",
+        description: "Please fill all fields for at least one item (Description, Size, Quantity, and Rate).",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (validItems.length !== processedItems.length) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill all mandatory fields (Description and Size) for all items.",
         variant: "destructive"
       });
       return;
