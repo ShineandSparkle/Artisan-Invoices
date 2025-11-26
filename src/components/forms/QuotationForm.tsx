@@ -106,14 +106,42 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
       return;
     }
 
+    if (!formData.date) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter quotation date.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.validUntil) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter valid until date.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate that ALL fields are filled for each item
     const validItems = items.filter(item => 
-      (item.description.trim() || item.shirt_size.trim()) && item.quantity > 0 && item.rate > 0
+      item.description.trim() && item.shirt_size.trim() && item.quantity > 0 && item.rate > 0
     );
     
     if (validItems.length === 0) {
       toast({
         title: "Validation Error", 
-        description: "Please add at least one valid item.",
+        description: "Please fill all fields for at least one item (Description, Size, Quantity, and Rate).",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (validItems.length !== items.length) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill all mandatory fields (Description and Size) for all items.",
         variant: "destructive"
       });
       return;
