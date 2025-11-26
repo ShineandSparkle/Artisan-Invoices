@@ -73,9 +73,8 @@ const QuotationList = ({
   });
 
   const getStatusBadge = (status: string) => {
-    const statusLower = status?.toLowerCase() || 'pending';
+    const statusLower = status?.toLowerCase() || 'sent';
     const variants: Record<string, any> = {
-      pending: { variant: "secondary", label: "Pending" },
       sent: { variant: "outline", label: "Sent" },
       accepted: { variant: "default", label: "Accepted", className: "bg-success text-success-foreground" },
       rejected: { variant: "destructive", label: "Rejected" },
@@ -83,7 +82,7 @@ const QuotationList = ({
       invoiced: { variant: "default", label: "Invoiced", className: "bg-primary text-primary-foreground" }
     };
     
-    const config = variants[statusLower] || variants.pending;
+    const config = variants[statusLower] || variants.sent;
     return (
       <Badge variant={config.variant} className={config.className}>
         {config.label}
@@ -180,7 +179,7 @@ const QuotationList = ({
                               Quotation to Invoice
                             </DropdownMenuItem>
                           )}
-                          {quotation.status === "pending" && (
+                          {quotation.status === "sent" && (
                             <DropdownMenuItem onClick={() => onSendToCustomer?.(quotation.id)}>
                               <Send className="mr-2 h-4 w-4" />
                               Send to Customer

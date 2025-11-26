@@ -19,7 +19,7 @@ const RecentInvoices = () => {
       client: "TechStart LLC",
       project: "E-commerce Platform",
       amount: "$8,200",
-      status: "pending",
+      status: "unpaid",
       date: "2024-01-12",
       dueDate: "2024-01-27",
     },
@@ -28,7 +28,7 @@ const RecentInvoices = () => {
       client: "Creative Agency",
       project: "Portfolio Website",
       amount: "$2,800",
-      status: "overdue",
+      status: "sent",
       date: "2024-01-08",
       dueDate: "2024-01-23",
     },
@@ -37,7 +37,7 @@ const RecentInvoices = () => {
       client: "Local Business",
       project: "Business Website",
       amount: "$1,900",
-      status: "draft",
+      status: "unpaid",
       date: "2024-01-20",
       dueDate: "2024-02-04",
     },
@@ -56,11 +56,9 @@ const RecentInvoices = () => {
     switch (status) {
       case 'paid':
         return 'bg-success text-success-foreground';
-      case 'pending':
+      case 'unpaid':
         return 'bg-warning text-warning-foreground';
-      case 'overdue':
-        return 'bg-destructive text-destructive-foreground';
-      case 'draft':
+      case 'sent':
         return 'bg-muted text-muted-foreground';
       default:
         return 'bg-muted text-muted-foreground';

@@ -157,15 +157,12 @@ const Dashboard = ({ quotations, invoices, customers, expenses = [], onCreateQuo
   const getStatusBadge = (status: string) => {
     const statusLower = status?.toLowerCase() || 'unpaid';
     const variants: Record<string, any> = {
-      draft: { variant: "secondary", label: "Draft" },
       sent: { variant: "outline", label: "Sent" },
       accepted: { variant: "default", label: "Accepted" },
       invoiced: { variant: "default", label: "Invoiced", className: "bg-primary text-primary-foreground" },
       rejected: { variant: "destructive", label: "Rejected" },
       paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground" },
-      pending: { variant: "secondary", label: "Pending" },
-      unpaid: { variant: "secondary", label: "Unpaid" },
-      overdue: { variant: "destructive", label: "Overdue" }
+      unpaid: { variant: "secondary", label: "Unpaid" }
     };
     
     const config = variants[statusLower] || variants.unpaid;

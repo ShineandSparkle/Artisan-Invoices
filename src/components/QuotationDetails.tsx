@@ -47,7 +47,6 @@ const QuotationDetails = ({ quotation, isOpen, onClose }: QuotationDetailsProps)
     const variants: Record<string, any> = {
       save: { variant: "secondary", label: "Save" },
       sent: { variant: "outline", label: "Sent" },
-      pending: { variant: "secondary", label: "Pending" },
       accepted: { variant: "default", label: "Accepted", className: "bg-success text-success-foreground" },
       rejected: { variant: "destructive", label: "Rejected" },
       expired: { variant: "secondary", label: "Expired" }

@@ -46,14 +46,12 @@ const InvoiceDetails = ({ invoice, isOpen, onClose }: InvoiceDetailsProps) => {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
-      draft: { variant: "secondary", label: "Draft" },
       sent: { variant: "outline", label: "Sent" },
-      pending: { variant: "secondary", label: "Pending" },
-      paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground" },
-      overdue: { variant: "destructive", label: "Overdue" }
+      unpaid: { variant: "secondary", label: "Unpaid" },
+      paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground" }
     };
     
-    const config = variants[status] || variants.draft;
+    const config = variants[status] || variants.unpaid;
     return (
       <Badge variant={config.variant} className={config.className}>
         {config.label}

@@ -76,7 +76,7 @@ const InvoiceForm = ({ customers, onSubmit, onCancel, initialData, mode = 'creat
         dueDate: initialData.due_date || "",
         notes: initialData.notes || "",
         taxType: initialData.tax_type || "IGST_18",
-        status: initialData.status?.toLowerCase() || "draft",
+        status: initialData.status?.toLowerCase() || "sent",
         complimentary: initialData.complimentary || false,
         taxMode: initialData.tax_mode || "exclusive"
       });
