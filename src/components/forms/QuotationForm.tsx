@@ -73,7 +73,7 @@ const QuotationForm = ({ customers, onSubmit, onCancel, initialData, mode = 'cre
         validUntil: initialData.valid_until || "",
         notes: initialData.notes || "",
         taxType: initialData.tax_type || "IGST_18",
-        status: initialData.status || "pending",
+        status: initialData.status || "sent",
         complimentary: initialData.complimentary || false,
         taxMode: initialData.tax_mode || "exclusive"
       });

@@ -11,7 +11,7 @@ const StatsCards = () => {
       description: "From 45 invoices this month",
     },
     {
-      title: "Pending Invoices",
+      title: "Unpaid Invoices",
       value: "8",
       change: "-2",
       icon: Clock,

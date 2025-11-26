@@ -77,12 +77,9 @@ const InvoiceList = ({
   const getStatusBadge = (status: string) => {
     const statusLower = status?.toLowerCase() || 'unpaid';
     const variants: Record<string, any> = {
-      draft: { variant: "secondary", label: "Draft", icon: Edit },
       sent: { variant: "outline", label: "Sent", icon: Send },
-      pending: { variant: "secondary", label: "Pending", icon: Clock },
       unpaid: { variant: "secondary", label: "Unpaid", icon: Clock },
-      paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground", icon: CheckCircle },
-      overdue: { variant: "destructive", label: "Overdue", icon: Clock }
+      paid: { variant: "default", label: "Paid", className: "bg-success text-success-foreground", icon: CheckCircle }
     };
 
     const config = variants[statusLower] || variants.unpaid;
